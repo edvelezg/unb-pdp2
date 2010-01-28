@@ -10,10 +10,14 @@
 *******************************************************************/
 
 #include <iostream>
-
+#include <time.h>
 using namespace std;
 
+/**
+ * Number of threads that will run simultaneously in a block
+ */
 const int blocksize = 32;
+time_t seconds;
 
 /*******************************************************************
 *
@@ -68,14 +72,19 @@ int main ( int argc, char *argv[] )
     float *b = new float[N];
     float *c = new float[N];
 
+    seconds = time (NULL);
+    srand(seconds);
+    
     for ( int i = 0; i < N*N; ++i )
     {
-        a[i] = 1.0f; 
+        // calculate a random number between 0 and 1000
+        a[i] = (float) (rand()%1000);
     }
 
     for ( int i = 0; i < N; ++i )
     {
-        b[i] = (float) i;
+        // calculate a random number between 0 and 1000
+        b[i] = (float) (rand()%1000);
         c[i] = (float) 0;
     }
 
@@ -96,22 +105,25 @@ int main ( int argc, char *argv[] )
 
     cudaMemcpy( c, cd, sizeVec, cudaMemcpyDeviceToHost );
 
-
-//  for ( int i = 0; i < N; ++i )
-//  {
-//      for ( int j = 0; j < N; ++j )
-//      {
-//          int index = i + j*N;
-//          cout << a[index] << " ";
-//      }
-//      cout << endl;
-//  }
+    //  for ( int j = 0; j < N; ++j )
+    //  {
+    //      for ( int i = 0; i < N; ++i )
+    //      {
+    //          int index = i + j*N;
+    //          cout << a[index] << " ";
+    //      }
+    //      cout << endl;
+    //  }
+    //
 
     for ( int i = 0; i < N; ++i )
     {
-        cout << "c[i]: " << c[i] << endl; 
+        cout << "c[" << i << "]: " << c[i] << endl;
     }
 
+    //  for ( int j = 0; j < N; ++j ) {
+    //      cout << "b[" << j << "]: " << b[j] << endl;
+    //  }
 
     cudaFree( ad ); 
     cudaFree( bd ); 
