@@ -13,7 +13,6 @@
 
 using namespace std;
 
-const int N = 1000;
 const int blocksize = 32;
 
 /*******************************************************************
@@ -35,21 +34,36 @@ void mult_matrix_by_vector( float* a, float *b, float *c, int N )
     float Cvalue = 0;
     int index;
 
+    /*
+    * Each thread will perform the dot product between the row of the matrix 
+    * and the vector that is being multiplied. 
+    */
     if ( i < N )
     {
         for ( int e = 0; e < N; ++e )
         {
-            index = e + i*N; //index = e + j*N;
-            Cvalue += a[index]*b[e];  // res[i] = res[i] + matrix[i][j]*vec[j];
+            index = e + i*N;
+            Cvalue += a[index]*b[e];
         }
         c[i] = Cvalue;
     }
 }
 
 
+int main ( int argc, char *argv[] )
+{
 
-int main() {
+    /**
+     * Command line arguments must be 1 which is the number of rows 
+     * and columns for a matrix and the size of the vector. 
+     */
+    if ( argc != 2 )
+    {
+        cout<<"usage: "<< argv[0] <<" <size n>\n";
+        return EXIT_FAILURE;
+    }
 
+    int N = atoi(argv[1]);
     float *a = new float[N*N];
     float *b = new float[N];
     float *c = new float[N];
@@ -76,7 +90,7 @@ int main() {
     cudaMemcpy( bd, b, sizeVec, cudaMemcpyHostToDevice );
 
     dim3 dimBlock(blocksize);
-    dim3 dimGrid(N/blocksize);
+    dim3 dimGrid(ceil(N/(float)blocksize));
 
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
@@ -93,7 +107,8 @@ int main() {
 //      cout << endl;
 //  }
 
-    for ( int i = 0; i < N; ++i ) {
+    for ( int i = 0; i < N; ++i )
+    {
         cout << "c[i]: " << c[i] << endl; 
     }
 
@@ -102,9 +117,9 @@ int main() {
     cudaFree( bd ); 
     cudaFree( cd );
 
-    delete[] a; 
+    delete[] a;
     delete[] b;
     delete[] c;
-    return EXIT_SUCCESS;
+    return 0;
 }
 
