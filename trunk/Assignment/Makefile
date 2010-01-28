@@ -13,7 +13,7 @@ matrixAdd:
 	
 matMulVec:
 	nvcc -O3 -o matMulVec matMulVec.cu
-	./matMulVec
+	./matMulVec 1000
 	rm matMulVec
 	
 clean:
