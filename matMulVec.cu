@@ -14,7 +14,7 @@
 using namespace std;
 
 const int N = 1000;
-const int blocksize = 16;
+const int blocksize = 32;
 
 /*******************************************************************
 *

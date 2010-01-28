@@ -1,4 +1,4 @@
-all: multMatbyVec
+all: matMulVec
 .PHONY: all clean
 
 incrementArray:
@@ -11,10 +11,10 @@ matrixAdd:
 	./matrixAdd
 	rm matrixAdd
 	
-multMatbyVec:
-	nvcc -O3 -o multMatbyVec multMatbyVec.cu
-	./multMatbyVec
-	rm multMatbyVec
+matMulVec:
+	nvcc -O3 -o matMulVec matMulVec.cu
+	./matMulVec
+	rm matMulVec
 	
 clean:
 	rm incrementArray matrixAdd
