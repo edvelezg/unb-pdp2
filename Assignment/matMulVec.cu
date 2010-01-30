@@ -10,7 +10,7 @@
 *******************************************************************/
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 using namespace std;
 
 /**
@@ -74,17 +74,17 @@ int main ( int argc, char *argv[] )
 
     seconds = time (NULL);
     srand(seconds);
-    
+
     for ( int i = 0; i < N*N; ++i )
     {
         // calculate a random number between 0 and 1000
-        a[i] = (float) (rand()%1000);
+        a[i] = (float) (rand()%RAND_MAX);
     }
 
     for ( int i = 0; i < N; ++i )
     {
         // calculate a random number between 0 and 1000
-        b[i] = (float) (rand()%1000);
+        b[i] = (float) (rand()%RAND_MAX);
         c[i] = (float) 0;
     }
 
@@ -101,9 +101,35 @@ int main ( int argc, char *argv[] )
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(N/(float)blocksize));
 
+    int idx;
+    for ( int i = 0; i < N; ++i )
+    {
+        for ( int j = 0; j < N; ++j )
+        {
+            idx = j + i*N;
+            c[i] += a[idx]*b[j];
+//          cout << "c[:" << i << "]" << c[i] << endl;
+        }
+    }
+
+    cout << "c[:" << 0 << "]=" << c[0] << endl; 
+    cout << "c[:" << 1 << "]=" << c[1] << endl; 
+    cout << "c[:" << 2 << "]=" << c[2] << endl; 
+    cout << "c[:" << 3 << "]=" << c[3] << endl; 
+    cout << "c[:" << 4 << "]=" << c[4] << endl; 
+
+    cout << endl; 
+
+
+    for ( int i = 0; i < N; ++i )
+    {
+        c[i] = (float) 0;
+    }
+
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
     cudaMemcpy( c, cd, sizeVec, cudaMemcpyDeviceToHost );
+
 
     //  for ( int j = 0; j < N; ++j )
     //  {
@@ -116,10 +142,11 @@ int main ( int argc, char *argv[] )
     //  }
     //
 
-    for ( int i = 0; i < N; ++i )
-    {
-        cout << "c[" << i << "]: " << c[i] << endl;
-    }
+    cout << "c[" << 0 << "]=" << c[0] << endl; 
+    cout << "c[" << 1 << "]=" << c[1] << endl; 
+    cout << "c[" << 2 << "]=" << c[2] << endl; 
+    cout << "c[" << 3 << "]=" << c[3] << endl; 
+    cout << "c[" << 4 << "]=" << c[4] << endl; 
 
     //  for ( int j = 0; j < N; ++j ) {
     //      cout << "b[" << j << "]: " << b[j] << endl;
@@ -134,4 +161,3 @@ int main ( int argc, char *argv[] )
     delete[] c;
     return 0;
 }
-
