@@ -14,7 +14,7 @@ matrixAdd:
 matMulVec:
 	nvcc -O3 -o matMulVec matMulVec.cu
 	./matMulVec 1000
-	rm matMulVec
+	# rm matMulVec
 	
 clean:
 	rm incrementArray matrixAdd
