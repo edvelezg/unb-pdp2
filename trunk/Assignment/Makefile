@@ -1,4 +1,4 @@
-all: matMulVec
+all: matMulVec matMulVecCPU
 .PHONY: all clean
 
 incrementArray:
@@ -12,9 +12,13 @@ matrixAdd:
 	rm matrixAdd
 	
 matMulVec:
-	nvcc -O3 -o matMulVec matMulVec.cu
-	./matMulVec 1000
+	nvcc -O2 -o matMulVec matMulVec.cu
+	# ./matMulVec 1000
 	# rm matMulVec
+
+matMulVecCPU:
+	g++ -g -o matMulVecCPU matMulVecCPU.c
+	# ./matMulVecCPU 1000
 	
 clean:
-	rm incrementArray matrixAdd
+	rm matMulVec matMulVecCPU

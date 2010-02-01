@@ -14,7 +14,7 @@
 using namespace std;
 
 /**
- * Number of threads that will run simultaneously in a block
+ * Number of threads in a block
  */
 const int blocksize = 32;
 time_t seconds;
@@ -108,23 +108,14 @@ int main ( int argc, char *argv[] )
         {
             idx = j + i*N;
             c[i] += a[idx]*b[j];
-//          cout << "c[:" << i << "]" << c[i] << endl;
         }
     }
 
-    cout << "c[:" << 0 << "]=" << c[0] << endl; 
-    cout << "c[:" << 1 << "]=" << c[1] << endl; 
-    cout << "c[:" << 2 << "]=" << c[2] << endl; 
-    cout << "c[:" << 3 << "]=" << c[3] << endl; 
-    cout << "c[:" << 4 << "]=" << c[4] << endl; 
-
-    cout << endl; 
-
-
-    for ( int i = 0; i < N; ++i )
-    {
-        c[i] = (float) 0;
-    }
+    cout << "c[" << 0 << "]=" << c[0] << endl; 
+    cout << "c[" << 1 << "]=" << c[1] << endl; 
+    cout << "c[" << 2 << "]=" << c[2] << endl; 
+    cout << "c[" << 3 << "]=" << c[3] << endl; 
+    cout << "c[" << 4 << "]=" << c[4] << endl; 
 
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
