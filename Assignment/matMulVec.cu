@@ -5,7 +5,7 @@
 *
 *    AUTHOR: Eduardo Gutarra Velez
 *
-*    DATE: 1/27/2010
+*    DATE: 02/01/2010
 *
 *******************************************************************/
 
@@ -14,7 +14,7 @@
 using namespace std;
 
 /**
- * Number of threads in a block
+ * Number of threads per block
  */
 const int blocksize = 32;
 time_t seconds;
@@ -101,47 +101,39 @@ int main ( int argc, char *argv[] )
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(N/(float)blocksize));
 
-    int idx;
-    for ( int i = 0; i < N; ++i )
-    {
-        for ( int j = 0; j < N; ++j )
-        {
-            idx = j + i*N;
-            c[i] += a[idx]*b[j];
-        }
-    }
-
-    cout << "c[" << 0 << "]=" << c[0] << endl; 
-    cout << "c[" << 1 << "]=" << c[1] << endl; 
-    cout << "c[" << 2 << "]=" << c[2] << endl; 
-    cout << "c[" << 3 << "]=" << c[3] << endl; 
-    cout << "c[" << 4 << "]=" << c[4] << endl; 
+    /**
+     * CPU-only version of the program.
+     */
+    //  int idx;
+    //  for ( int i = 0; i < N; ++i )
+    //  {
+    //      for ( int j = 0; j < N; ++j )
+    //      {
+    //          idx = j + i*N;
+    //          c[i] += a[idx]*b[j];
+    //      }
+    //  }
+    //
+    //  cout << "c[:" << 0 << "]=" << c[0] << endl;
+    //  cout << "c[:" << 1 << "]=" << c[1] << endl;
+    //  cout << "c[:" << 2 << "]=" << c[2] << endl;
+    //  cout << "c[:" << 3 << "]=" << c[3] << endl;
+    //  cout << "c[:" << 4 << "]=" << c[4] << endl;
+    //
+    //  cout << endl;
 
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
     cudaMemcpy( c, cd, sizeVec, cudaMemcpyDeviceToHost );
 
-
-    //  for ( int j = 0; j < N; ++j )
-    //  {
-    //      for ( int i = 0; i < N; ++i )
-    //      {
-    //          int index = i + j*N;
-    //          cout << a[index] << " ";
-    //      }
-    //      cout << endl;
-    //  }
-    //
-
-    cout << "c[" << 0 << "]=" << c[0] << endl; 
-    cout << "c[" << 1 << "]=" << c[1] << endl; 
-    cout << "c[" << 2 << "]=" << c[2] << endl; 
-    cout << "c[" << 3 << "]=" << c[3] << endl; 
-    cout << "c[" << 4 << "]=" << c[4] << endl; 
-
-    //  for ( int j = 0; j < N; ++j ) {
-    //      cout << "b[" << j << "]: " << b[j] << endl;
-    //  }
+    /**
+     * GPU Output.
+     */
+    //  cout << "c[" << 0 << "]=" << c[0] << endl;
+    //  cout << "c[" << 1 << "]=" << c[1] << endl;
+    //  cout << "c[" << 2 << "]=" << c[2] << endl;
+    //  cout << "c[" << 3 << "]=" << c[3] << endl;
+    //  cout << "c[" << 4 << "]=" << c[4] << endl;
 
     cudaFree( ad ); 
     cudaFree( bd ); 
