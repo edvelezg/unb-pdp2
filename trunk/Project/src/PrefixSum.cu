@@ -51,6 +51,7 @@ __global__ void scan(float *g_odata, float *g_idata, int n)
         __syncthreads();
     }
     g_odata[thid] = temp[pout*n+thid]; // write output
+	// g_odata[thid] = 3.0;
 	printf("g_odata = %f\n", g_odata[thid]);
 
 }
