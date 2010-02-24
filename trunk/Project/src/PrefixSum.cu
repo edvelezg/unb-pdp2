@@ -51,6 +51,8 @@ __global__ void scan(float *g_odata, float *g_idata, int n)
         __syncthreads();
     }
     g_odata[thid] = temp[pout*n+thid]; // write output
+	printf("g_odata = %f\n", g_odata[thid]);
+
 }
 
 __global__ void prescan(float *g_odata, float *g_idata, int n)
@@ -138,7 +140,7 @@ int main ( int argc, char *argv[] )
 
     cout << endl;
 
-    prescan<<<dimGrid, dimBlock>>>( bd, ad, N );
+    scan<<<dimGrid, dimBlock>>>( bd, ad, N );
 
     cudaMemcpy( b, bd, sizeVec, cudaMemcpyDeviceToHost );
 

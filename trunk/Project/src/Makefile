@@ -7,19 +7,28 @@
 #
 
 CC=nvcc
-CFLAGS=-c -Wall
-LDFLAGS=
+CFLAGS=-c -deviceemu
+LDFLAGS=-deviceemu -O2
 SOURCES=PrefixSum.cu
 OBJECTS=$(SOURCES:.cu=.o)
 EXECUTABLE=PrefixSum
 
 all: $(EXECUTABLE)
 	
-$(EXECUTABLE): $(SOURCES)
-	$(CC) $(LDFLAGS) $(SOURCES) -o $@
+# $(EXECUTABLE): $(SOURCES)
+# 	$(CC) $(LDFLAGS) $(SOURCES) -o $@
 
-.cu.o:
-	$(CC) $(CFLAGS) $< -o $@
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	
+	# $(NVCC) -c %^ $(CFLAGS) -o $@
+	# $(NVCC) -M %^ $(CFLAGS) > $@.dep
+		
+# .cu.o:
+# 	$(CC) $(CFLAGS) $< -o $@
+
+%.o : %.cu
+	$(CC) -c $< $(CFLAGS) -o $@
 
 .PHONY: clean
 clean:
