@@ -20,12 +20,20 @@ OUTDIR=Debug
 CC=nvcc
 CFLAGS=-g -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" --device-emulation
 LDFLAGS=-ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2
+
 SOURCES=PrefixSum.cu
+
 OBJECTS=$(SOURCES:.cu=.o)
+	
 EXECUTABLE=PrefixSum
+EXECUTABLE2=Sample
 OUTFILE=$(OUTDIR)/$(EXECUTABLE)
 
-all: $(OUTFILE)
+all: $(OUTFILE) $(EXECUTABLE2)
+
+$(EXECUTABLE2): $(OBJECTS2)
+		$(CC) $(OBJECTS2) $(LDFLAGS) -o $@
+		@echo done
 	
 $(OUTFILE): $(OUTDIR) $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
@@ -39,7 +47,7 @@ $(OUTDIR):
 
 .PHONY: clean
 clean:
-	$(RM) $(EXECUTABLE) $(OBJECTS)
+	$(RM) $(EXECUTABLE) $(EXECUTABLE2) $(OBJECTS)
 
 endif
 
