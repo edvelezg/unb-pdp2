@@ -1,6 +1,47 @@
 [Global]
 CurrentProject=PrefixSum.vpj
 [ProjectDates]
-PrefixSum.vpj=20100224014559694
+PrefixSum.vpj=20100226013139608
 [ActiveConfig]
 PrefixSum.vpj=Release
+[TreeExpansion2]
+- PrefixSum.vpj
+  - Source Files
+  + Header Files
+  + Resource Files
+  + Bitmaps
+  - Other Files
+scroll:0
+[State]
+SCREEN: 1680 1050 27 15 840 990 0 0 M 0 0 0 0 1630 832 0
+CWD: ..\src
+BUFFER: BN="Makefile"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Makefile	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.770 CL=1 LE=0 CX=1 CY=29 WI=5 BI=12 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="PrefixSum.cu"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.3847 CL=1 LE=0 CX=1 CY=25 WI=5 BI=4 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="Reduction.cu"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=131073 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.103 CL=1 LE=0 CX=1 CY=6 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 80 46 599 571 -1 -1 N  WF=0 WT=1 ",,,"
+BUFFER: BN="PrefixSum.cu"
+VIEW: LN=.3847 CL=1 LE=0 CX=1 CY=25 WI=214 BI=4 HT=0 HN=0 HF=0 HC=4
+WINDOW: 160 184 599 571 -1 -1 N  WF=0 WT=2 ",,,"
+BUFFER: BN="Makefile"
+VIEW: LN=.770 CL=1 LE=0 CX=1 CY=29 WI=169 BI=12 HT=0 HN=0 HF=0 HC=4
+WINDOW: 40 207 1263 582 -1 -1 M  WF=0 WT=3 ",,,"
+BUFFER: BN="Reduction.cu"
+VIEW: LN=.103 CL=1 LE=0 CX=1 CY=6 WI=114 BI=15 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+..\..\Assignment\Makefile
+..\..\Assignment\nvidiaAddMatrix.cu
+..\..\Assignment\matMulVec.cu
+..\..\Assignment\prefix.cu
+..\..\..\..\..\..\AppData\Local\Temp\vserr.4112
+cuda_profile.log
+PrefixSum.cu
+Makefile
+Reduction.cu
+PROJECT_CACHE: 0
+TBCLASS: 0 0
