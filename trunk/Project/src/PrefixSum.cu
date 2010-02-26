@@ -8,6 +8,11 @@
 *    DATE: 02/01/2010
 *
 *******************************************************************/
+#define CUERR do{ cudaError_t err; \
+cudaThreadSynchronize(); \
+if ((err = cudaGetLastError()) != cudaSuccess) { \
+printf("ERROR: CUDA error: %s, line %d\n", cudaGetErrorString(err), __LINE__); \
+exit(1);}}while(0)
 
 #include <iostream>
 #include <ctime>
@@ -16,21 +21,9 @@ using namespace std;
 /**
  * Number of threads per block
  */
-const int blocksize = 16;
+const int blocksize = 8;
 time_t seconds;
 
-/*******************************************************************
-*
-*    Kernel Name: mult_matrix_by_vector
-*
-*    Parameters: inputs are: matrix a (size NxN ), array b (size N),
-*    value of N. ouputs are: 
-*
-*    Description: This is the kernel to perform the multiplication
-*    between a matrix and a vector. Each thread performs the dot
-*    product between each row and the vector.
-*
-*******************************************************************/
 __global__ void scan(float *g_odata, float *g_idata, int n)
 {
     extern __shared__ float temp[]; // allocated on invocation
@@ -52,7 +45,7 @@ __global__ void scan(float *g_odata, float *g_idata, int n)
     }
     g_odata[thid] = temp[pout*n+thid]; // write output
 	// g_odata[thid] = 3.0;
-	printf("g_odata = %f\n", g_odata[thid]);
+//  printf("g_odata = %f\n", g_odata[thid]);
 
 }
 
@@ -109,7 +102,7 @@ int main ( int argc, char *argv[] )
 //      return EXIT_FAILURE;
 //  }
 
-    int N = 16;
+    int N = 1024;
     float *a = new float[N];
     float *b = new float[N];
 //  float *c = new float[N];
@@ -120,7 +113,7 @@ int main ( int argc, char *argv[] )
     for ( int i = 0; i < N; ++i )
     {
         a[i] = (float) i*2.0;
-        cout << "a[" << i << "]: " << a[i] << endl; 
+        //cout << "a[" << i << "]: " << a[i] << endl; 
     }
 
     for ( int i = 0; i < N; ++i )
@@ -135,24 +128,27 @@ int main ( int argc, char *argv[] )
     cudaMalloc( (void**)&ad, sizeVec );
     cudaMalloc( (void**)&bd, sizeVec );
     cudaMemcpy( ad, a, sizeVec, cudaMemcpyHostToDevice );
+    CUERR;
 
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(N/(float)blocksize));
 
     cout << endl;
 
-    scan<<<dimGrid, dimBlock>>>( bd, ad, N );
+    prescan<<<dimGrid, dimBlock>>>( bd, ad, N );
+    CUERR;
 
     cudaMemcpy( b, bd, sizeVec, cudaMemcpyDeviceToHost );
+    CUERR;
 
     /**
      * GPU Output.
      */
 
-    for ( int i = 0; i < N; ++i )
+    /*for ( int i = 0; i < N; ++i )
     {
         cout << "b[" << i << "]: " << b[i] << endl; 
-    }
+    }*/
 
     cudaFree( ad ); 
     cudaFree( bd ); 

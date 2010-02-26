@@ -18,8 +18,8 @@ MKDIR=mkdir
 ifeq "$(CFG)" "Debug"
 OUTDIR=Debug
 CC=nvcc
-CFLAGS=--device-emulation
-LDFLAGS=-O2
+CFLAGS=-g -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" --device-emulation
+LDFLAGS=-ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2
 SOURCES=PrefixSum.cu
 OBJECTS=$(SOURCES:.cu=.o)
 EXECUTABLE=PrefixSum
@@ -74,3 +74,11 @@ clean:
 	$(RM) $(OUTFILE) $(OBJECTS)
 
 endif
+
+#make
+
+#mkdir -p "Debug"
+#nvcc PrefixSum.o -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2 -o Debug/PrefixSum
+#cl : Command line warning D9024 : unrecognized source file type 'PrefixSum.o', o
+#bject file assumed
+#done

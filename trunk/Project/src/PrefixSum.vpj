@@ -22,7 +22,7 @@
 				CaptureOutputWith="ProcessBuffer"
 				SaveOption="SaveWorkspaceFiles"
 				RunFromDir="%rw">
-				<Exec CmdLine='nvcc.exe -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2 -o %bd%rn %n%e'/>
+				<Exec CmdLine='//nvcc.exe -I="C:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\inc" -L="C:\CUDA\lib" -lcudart -L="C:\ProgramData\NVIDIA Corporation\NVIDIA GPU Computing SDK\C\common\lib" -lcutil -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2 -o %bd%rn %n%e'/>
 			</Target>
 			<Target
 				Name="Rebuild"
@@ -36,8 +36,9 @@
 				Name="Debug"
 				MenuCaption="&amp;Debug"
 				SaveOption="SaveNone"
-				RunFromDir="%rw">
-				<Exec/>
+				RunFromDir="%rw"
+				CaptureOutputWith="ProcessBuffer">
+				<Exec CmdLine='nvcc.exe --device-emulation -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2 -o %bd%rn %n%e'/>
 			</Target>
 			<Target
 				Name="Execute"
@@ -58,6 +59,7 @@
 				Recurse="0"
 				Refilter="0"
 				Excludes=""/>
+			<F N="MatrixAdd.cu"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
@@ -71,6 +73,9 @@
 		<Folder
 			Name="Other Files"
 			Filters="">
+			<F
+				N="Makefile"
+				Type="Makefile"/>
 		</Folder>
 	</Files>
 </Project>
