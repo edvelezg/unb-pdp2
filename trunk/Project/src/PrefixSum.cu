@@ -1,3 +1,5 @@
+<<<<<<< .mine
+=======
 /*******************************************************************
 *
 *    DESCRIPTION: This program performs the multiplication between
@@ -14,6 +16,7 @@ if ((err = cudaGetLastError()) != cudaSuccess) { \
 printf("ERROR: CUDA error: %s, line %d\n", cudaGetErrorString(err), __LINE__); \
 exit(1);}}while(0)
 
+>>>>>>> .r25
 #include <iostream>
 #include <ctime>
 using namespace std;
