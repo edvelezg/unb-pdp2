@@ -232,3 +232,91 @@ int main( int argc, char** argv)
     cutilSafeCall(cudaFree(d_idata));
     cutilSafeCall(cudaFree(d_odata));
 }
+
+
+robot emits infrared
+if (robot detects obstacle) {
+  if (obstacle is to the left) {
+    OS_Write(MotorProcessFifo, LEFT);
+  }
+  else if (obstacle is to the right) {
+    OS_Write(MotorProcessFifo, RIGHT);
+  }
+}
+else
+{
+  OS_Write(MotorProcessFifo, NONE);
+}
+
+OS_Read(MotorProcessFifo, &value)
+if (value == LEFT) 
+{
+  move robot back
+  send voltage to right wheel
+}
+else if (value == RIGHT) 
+{
+  move robot back
+  send voltage to left wheel
+}
+else // Assumes the process has encountered no obstacles.
+{
+  send voltage to both wheels
+}
+
+
+while (true) 
+{
+  if (light is detected) 
+  {
+    OS_Wait(BuzzerSemaphore) //Waiting primitive of the operating system.
+    robot beeps to the intensity of light.
+  }
+  else
+  {
+    OS_Signal(BuzzerSemaphore) //When no light is detected the process stops
+                //occupying the piezo buzzer.
+    OS_Yield()  
+  }
+}
+	
+	
+Sporadic processes produce a pattern.
+	Pattern is communicated from sporadic process and played 	by device process.
+	Robot advances normally
+	Robot  uses infrared  to detect if it has to make a turn.
+
+Character = Produce Character()
+OS_Wait(Message Queue Semaphore);
+OS_Write(Buzzer Process Queue, character)
+OS_Signal(MessageQueueSemaphore);
+
+OS_Read(DeviceProcessQueue);
+
+semaphore fillCount = 0
+semaphore emptyCount = FIFOSIZE
+
+sporadic process() {
+    while (true) {
+        character = produceCharacter()
+        OS_Wait(emptyCount)
+        OS_Write(character)
+        OS_Signal(fillCount)
+    }
+ }
+
+device buzzer process() {
+    while (true) {
+        OS_Wait(fillCount)
+        OS_Read(character)
+        OS_Signal(emptyCount)
+        reproduce beep with character
+    }
+}
+
+process A ()
+{
+  OS_Wait(LCD Semaphore);
+  write message;
+  OS_Signal(LCD Semaphore)
+}
