@@ -7,34 +7,41 @@
 #
 
 # If no configuration is specified, "Debug" will be used
-ifndef CFG
-CFG=Debug
-endif
+# ifndef CFG
+# CFG=Debug
+# endif
 
 MKDIR=mkdir
 #
 # Configuration: Debug
 #
-ifeq "$(CFG)" "Debug"
+# ifeq "$(CFG)" "Debug"
 OUTDIR=Debug
 CC=nvcc
-CFLAGS=-g -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" --device-emulation
-LDFLAGS=-ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2
+CFLAGS=-g
+LDFLAGS=-O2
+
+# CFLAGS=-c
+# LDFLAGS=
 
 SOURCES=PrefixSum.cu
 
 OBJECTS=$(SOURCES:.cu=.o)
 	
 EXECUTABLE=PrefixSum
-EXECUTABLE2=Sample
 OUTFILE=$(OUTDIR)/$(EXECUTABLE)
+
+.PHONY: clean all
 
 all: $(OUTFILE) $(EXECUTABLE2)
 
 $(EXECUTABLE2): $(OBJECTS2)
 		$(CC) $(OBJECTS2) $(LDFLAGS) -o $@
 		@echo done
-	
+
+$(EXECUTABLE): $(SOURCES)
+	$(CC) $(LDFLAGS) $(SOURCES) -o $@
+
 $(OUTFILE): $(OUTDIR) $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	@echo done
@@ -45,43 +52,43 @@ $(OUTFILE): $(OUTDIR) $(OBJECTS)
 $(OUTDIR):
 	$(MKDIR) -p "$(OUTDIR)"
 
-.PHONY: clean
+# .PHONY: clean
 clean:
 	$(RM) $(EXECUTABLE) $(EXECUTABLE2) $(OBJECTS)
 
-endif
-
-#
-# Configuration: Release
-#
-ifeq "$(CFG)" "Release"
-OUTDIR=Release
-CC=nvcc
-CFLAGS=
-LDFLAGS=-O2
-SOURCES=PrefixSum.cu
-OBJECTS=$(SOURCES:.cu=.o)
-EXECUTABLE=PrefixSum
-OUTFILE=$(OUTDIR)/$(EXECUTABLE)
-
-all: $(OUTFILE)
-	
-$(OUTFILE): $(OUTDIR) $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-	@echo done
-
-$(OUTDIR):
-	$(MKDIR) -p "$(OUTDIR)"
-
-# Pattern rules
-$(OUTDIR)%.o : %.cu
-	$(CC) -c $< $(CFLAGS) -o $@
-
-.PHONY: clean
-clean:
-	$(RM) $(OUTFILE) $(OBJECTS)
-
-endif
+# endif
+# 
+# #
+# # Configuration: Release
+# #
+# ifeq "$(CFG)" "Release"
+# OUTDIR=Release
+# CC=nvcc
+# CFLAGS=
+# LDFLAGS=-O2
+# SOURCES=PrefixSum.cu
+# OBJECTS=$(SOURCES:.cu=.o)
+# EXECUTABLE=PrefixSum
+# OUTFILE=$(OUTDIR)/$(EXECUTABLE)
+# 
+# all: $(OUTFILE)
+# 	
+# $(OUTFILE): $(OUTDIR) $(OBJECTS)
+# 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+# 	@echo done
+# 
+# $(OUTDIR):
+# 	$(MKDIR) -p "$(OUTDIR)"
+# 
+# # Pattern rules
+# $(OUTDIR)%.o : %.cu
+# 	$(CC) -c $< $(CFLAGS) -o $@
+# 
+# .PHONY: clean
+# clean:
+# 	$(RM) $(OUTFILE) $(OBJECTS)
+# 
+# endif
 
 #make
 
