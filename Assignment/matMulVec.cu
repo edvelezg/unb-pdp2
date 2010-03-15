@@ -130,7 +130,7 @@ int main ( int argc, char *argv[] )
      * GPU Output.
      */
     //  cout << "c[" << 0 << "]=" << c[0] << endl;
-    //  cout << "c[" << 1 << "]=" << c[1] << endl;
+    //  cout << "c[" << 1 << "]=" << c[1] << endl; 
     //  cout << "c[" << 2 << "]=" << c[2] << endl;
     //  cout << "c[" << 3 << "]=" << c[3] << endl;
     //  cout << "c[" << 4 << "]=" << c[4] << endl;
