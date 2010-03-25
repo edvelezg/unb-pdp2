@@ -1,4 +1,4 @@
-/*
+ /*
  * This is a basic example of how to use the CUDPP library.
  */
 
@@ -57,7 +57,7 @@ main( int argc, char** argv)
      */
     if ( argc != 2 )
     {
-        cout<<"usage: "<< argv[0] <<" <size n>\n";
+        printf("usage:%s <size n>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -110,13 +110,13 @@ main( int argc, char** argv)
     //      }
     //  }
     //
-    //  cout << "c[:" << 0 << "]=" << c[0] << endl;
-    //  cout << "c[:" << 1 << "]=" << c[1] << endl;
-    //  cout << "c[:" << 2 << "]=" << c[2] << endl;
-    //  cout << "c[:" << 3 << "]=" << c[3] << endl;
-    //  cout << "c[:" << 4 << "]=" << c[4] << endl;
+    //  // cout << "c[:" << 0 << "]=" << c[0] << endl;
+    //  // cout << "c[:" << 1 << "]=" << c[1] << endl;
+    //  // cout << "c[:" << 2 << "]=" << c[2] << endl;
+    //  // cout << "c[:" << 3 << "]=" << c[3] << endl;
+    //  // cout << "c[:" << 4 << "]=" << c[4] << endl;
     //
-    //  cout << endl;
+    //  // cout << endl;
 
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
@@ -125,11 +125,16 @@ main( int argc, char** argv)
     /**
      * GPU Output.
      */
-    cout << "c[" << 0 << "]=" << c[0] << endl;
-    cout << "c[" << 1 << "]=" << c[1] << endl;
-    cout << "c[" << 2 << "]=" << c[2] << endl;
-    cout << "c[" << 3 << "]=" << c[3] << endl;
-//  cout << "c[" << 4 << "]=" << c[4] << endl;
+	printf("c[0]= %f\n", c[0]);
+	printf("c[1]= %f\n", c[1]);
+	printf("c[2]= %f\n", c[2]);
+	printf("c[3]= %f\n", c[3]);
+
+    // cout << "c[" << 0 << "]=" << c[0] << endl;
+    // cout << "c[" << 1 << "]=" << c[1] << endl;
+    // cout << "c[" << 2 << "]=" << c[2] << endl;
+    // cout << "c[" << 3 << "]=" << c[3] << endl;
+//  // cout << "c[" << 4 << "]=" << c[4] << endl;
 
     cudaFree( ad ); 
     cudaFree( bd ); 
@@ -140,7 +145,8 @@ main( int argc, char** argv)
     delete[] c;
 
     runTest( argc, argv);
-    CUT_EXIT(argc, argv);
+    // CUT_EXIT(argc, argv);
+	exit(EXIT_SUCCESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
