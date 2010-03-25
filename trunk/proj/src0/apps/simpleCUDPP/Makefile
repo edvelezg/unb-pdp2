@@ -10,7 +10,7 @@
 BINDIR := .
 EXECUTABLE	:= simpleCUDPP
 
-CCFILES :=	scan_gold.cpp
+# CCFILES :=	scan_gold.cpp
 CUFILES :=	simpleCUDPP.cu
 
 INCLUDES := -I../../cudpp/include
