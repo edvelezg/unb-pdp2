@@ -1,0 +1,29 @@
+[Global]
+CurrentProject=Assi1.vpj
+[ProjectDates]
+Assi1.vpj=20100325172613122
+[ActiveConfig]
+Assi1.vpj=Release
+[TreeExpansion2]
+- Assi1.vpj
+  + Source Files
+  + Header Files
+  + Resource Files
+  + Bitmaps
+  - Other Files
+scroll:0
+[State]
+SCREEN: 1680 1050 0 0 840 990 0 0 N 0 0 0 0 774 816 0
+CWD: ..\assi1
+FILEHIST: 9
+..\..\..\..\..\AppData\Local\Temp\vserr.4112
+..\proj\src\cuda_profile.log
+..\proj\src\Makefile
+..\..\..\OS\cs4405winter2010-read-only\README.txt
+..\proj\src\Reduction.cu
+..\..\..\..\..\Downloads\WebHelp.e
+..\proj\src\MatrixAdd.cu
+\Program Files\SlickEditV14.0.2\macros\c.e
+..\proj\src\PrefixSum.cu
+PROJECT_CACHE: 0
+TBCLASS: 0 0

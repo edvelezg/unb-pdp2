@@ -78,13 +78,15 @@ int main ( int argc, char *argv[] )
     for ( int i = 0; i < N*N; ++i )
     {
         // calculate a random number between 0 and 1000
-        a[i] = (float) (rand()%RAND_MAX);
+//      a[i] = (float) (rand()%RAND_MAX);
+        a[i] = (float) i;
     }
 
     for ( int i = 0; i < N; ++i )
     {
         // calculate a random number between 0 and 1000
-        b[i] = (float) (rand()%RAND_MAX);
+//      b[i] = (float) (rand()%RAND_MAX);
+        b[i] = (float) i;
         c[i] = (float) 0;
     }
 
@@ -129,11 +131,11 @@ int main ( int argc, char *argv[] )
     /**
      * GPU Output.
      */
-    //  cout << "c[" << 0 << "]=" << c[0] << endl;
-    //  cout << "c[" << 1 << "]=" << c[1] << endl; 
-    //  cout << "c[" << 2 << "]=" << c[2] << endl;
-    //  cout << "c[" << 3 << "]=" << c[3] << endl;
-    //  cout << "c[" << 4 << "]=" << c[4] << endl;
+    cout << "c[" << 0 << "]=" << c[0] << endl;
+    cout << "c[" << 1 << "]=" << c[1] << endl;
+    cout << "c[" << 2 << "]=" << c[2] << endl;
+    cout << "c[" << 3 << "]=" << c[3] << endl;
+//  cout << "c[" << 4 << "]=" << c[4] << endl;
 
     cudaFree( ad ); 
     cudaFree( bd ); 
