@@ -6,7 +6,7 @@ Assi1.vpj=20100325172613122
 Assi1.vpj=Release
 [TreeExpansion2]
 - Assi1.vpj
-  + Source Files
+  - Source Files
   + Header Files
   + Resource Files
   + Bitmaps
@@ -16,8 +16,6 @@ scroll:0
 SCREEN: 1680 1050 0 0 840 990 0 0 N 0 0 0 0 774 816 0
 CWD: ..\assi1
 FILEHIST: 9
-..\..\..\..\..\AppData\Local\Temp\vserr.4112
-..\proj\src\cuda_profile.log
 ..\proj\src\Makefile
 ..\..\..\OS\cs4405winter2010-read-only\README.txt
 ..\proj\src\Reduction.cu
@@ -25,5 +23,17 @@ FILEHIST: 9
 ..\proj\src\MatrixAdd.cu
 \Program Files\SlickEditV14.0.2\macros\c.e
 ..\proj\src\PrefixSum.cu
-PROJECT_CACHE: 0
+matMulVec.cu
+prefix.cu
+PROJECT_CACHE: 1
+20100325172613122 9 C:\Users\Viper\Documents\UNB-Courses\PDP2\unb-pdp2\assi1\Assi1.vpj
+Himanshu.cu
+incrementArray.cu
+matMulVec.cu
+nvidiaAddMatrix.cu
+prac1a.cu
+prac1b.cu
+prefix.cu
+Makefile
+README
 TBCLASS: 0 0
