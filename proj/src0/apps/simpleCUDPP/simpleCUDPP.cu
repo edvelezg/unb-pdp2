@@ -97,27 +97,6 @@ main( int argc, char** argv)
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(N/(float)blocksize));
 
-    /**
-     * CPU-only version of the program.
-     */
-    //  int idx;
-    //  for ( int i = 0; i < N; ++i )
-    //  {
-    //      for ( int j = 0; j < N; ++j )
-    //      {
-    //          idx = j + i*N;
-    //          c[i] += a[idx]*b[j];
-    //      }
-    //  }
-    //
-    //  // cout << "c[:" << 0 << "]=" << c[0] << endl;
-    //  // cout << "c[:" << 1 << "]=" << c[1] << endl;
-    //  // cout << "c[:" << 2 << "]=" << c[2] << endl;
-    //  // cout << "c[:" << 3 << "]=" << c[3] << endl;
-    //  // cout << "c[:" << 4 << "]=" << c[4] << endl;
-    //
-    //  // cout << endl;
-
     mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
 
     cudaMemcpy( c, cd, sizeVec, cudaMemcpyDeviceToHost );
@@ -129,12 +108,6 @@ main( int argc, char** argv)
 	printf("c[1]= %f\n", c[1]);
 	printf("c[2]= %f\n", c[2]);
 	printf("c[3]= %f\n", c[3]);
-
-    // cout << "c[" << 0 << "]=" << c[0] << endl;
-    // cout << "c[" << 1 << "]=" << c[1] << endl;
-    // cout << "c[" << 2 << "]=" << c[2] << endl;
-    // cout << "c[" << 3 << "]=" << c[3] << endl;
-//  // cout << "c[" << 4 << "]=" << c[4] << endl;
 
     cudaFree( ad ); 
     cudaFree( bd ); 
