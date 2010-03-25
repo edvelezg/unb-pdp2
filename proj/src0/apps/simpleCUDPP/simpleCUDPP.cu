@@ -1,13 +1,3 @@
-// -------------------------------------------------------------
-// cuDPP -- CUDA Data Parallel Primitives library
-// -------------------------------------------------------------
-// $Revision$
-// $Date$
-// ------------------------------------------------------------- 
-// This source code is distributed under the terms of license.txt in
-// the root directory of this source distribution.
-// ------------------------------------------------------------- 
-
 /*
  * This is a basic example of how to use the CUDPP library.
  */
@@ -26,11 +16,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
 void runTest( int argc, char** argv);
-
-extern "C" 
-void computeSumScanGold( float *reference, const float *idata, 
-                        const unsigned int len,
-                        const CUDPPConfiguration &config);
+// 
+// extern "C" 
+// void computeSumScanGold( float *reference, const float *idata, 
+//                         const unsigned int len,
+//                         const CUDPPConfiguration &config);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -39,7 +29,6 @@ int
 main( int argc, char** argv) 
 {
     runTest( argc, argv);
-
     CUT_EXIT(argc, argv);
 }
 
@@ -51,17 +40,27 @@ runTest( int argc, char** argv)
 {
     CUT_DEVICE_INIT(argc, argv);
 
-    unsigned int numElements = 32;
-    unsigned int memSize = sizeof( float) * numElements;
+    unsigned int numElements = 32; // number of elements 
+    unsigned int memSize = sizeof( float) * numElements; // size of the memory
 
     // allocate host memory
-    float* h_idata = (float*) malloc( memSize);
-    // initalize the memory
+    float* h_idata = (float*) malloc( memSize); // allocating input data
+    char* h_sdata = (char*) malloc( memSize); // allocating input data
+
+    // initalizing the memory with the elements
     for (unsigned int i = 0; i < numElements; ++i) 
     {
-		h_idata[i] = (float) i; // (rand() & 0xf);
-		printf("i = %d\n", i);
+		h_idata[i] = (float) (i+1);
+		printf("i = %f\n", h_idata[i]);
     }
+	
+	// allocating symbolic data
+    for (unsigned int i = 0; i < numElements; ++i) 
+    {
+		h_sdata[i] = 'A' + (char)i; // (rand() & 0xf);
+		printf("i = %c\n", h_sdata[i]);
+    }
+
 
     // allocate device memory
     float* d_idata;
@@ -101,13 +100,6 @@ runTest( int argc, char** argv)
     // copy result from device to host
     CUDA_SAFE_CALL( cudaMemcpy( h_odata, d_odata, memSize,
                                 cudaMemcpyDeviceToHost) );
-    // compute reference solution
-    // float* reference = (float*) malloc( memSize);
-    // computeSumScanGold( reference, h_idata, numElements, config);
-    // 
-    // // check result
-    // CUTBoolean res = cutComparef( reference, h_odata, numElements);
-    // printf( "Test %s\n", (1 == res) ? "PASSED" : "FAILED");
 
 	for(size_t i = 0; i < numElements; ++i)
 	{
