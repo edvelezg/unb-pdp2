@@ -19,11 +19,10 @@ const int blocksize = 32;
 time_t seconds;
 
 __global__
-void mult_matrix_by_vector( float* a, float *b, float *c, int N )
+void initUncompressedArr(float *c, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     float Cvalue = 0;
-    int index;
 
     /*
     * Each thread will perform the dot product between the row of the matrix 
@@ -31,11 +30,6 @@ void mult_matrix_by_vector( float* a, float *b, float *c, int N )
     */
     if ( i < N )
     {
-        for ( int e = 0; e < N; ++e )
-        {
-            index = e + i*N;
-            Cvalue += a[index]*b[e];
-        }
         c[i] = Cvalue;
     }
 }
@@ -50,73 +44,6 @@ void runTest( int argc, char** argv);
 int
 main( int argc, char** argv) 
 {
-
-    /**
-     * Command line arguments must be 1 which is the number of rows 
-     * and columns for a matrix and the size of the vector. 
-     */
-    if ( argc != 2 )
-    {
-        printf("usage:%s <size n>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    int N = atoi(argv[1]);
-    float *a = new float[N*N];
-    float *b = new float[N];
-    float *c = new float[N];
-
-    seconds = time (NULL);
-    srand(seconds);
-
-    for ( int i = 0; i < N*N; ++i )
-    {
-        // calculate a random number between 0 and 1000
-//      a[i] = (float) (rand()%RAND_MAX);
-        a[i] = (float) i;
-    }
-
-    for ( int i = 0; i < N; ++i )
-    {
-        // calculate a random number between 0 and 1000
-//      b[i] = (float) (rand()%RAND_MAX);
-        b[i] = (float) i;
-        c[i] = (float) 0;
-    }
-
-    float *ad, *bd, *cd;
-    const int sizeVec = N*sizeof(float);
-    const int sizeMat = N*sizeVec;
-
-    cudaMalloc( (void**)&ad, sizeMat );
-    cudaMalloc( (void**)&bd, sizeVec );
-    cudaMalloc( (void**)&cd, sizeVec );
-    cudaMemcpy( ad, a, sizeMat, cudaMemcpyHostToDevice );
-    cudaMemcpy( bd, b, sizeVec, cudaMemcpyHostToDevice );
-
-    dim3 dimBlock(blocksize);
-    dim3 dimGrid(ceil(N/(float)blocksize));
-
-    mult_matrix_by_vector<<<dimGrid, dimBlock>>>( ad, bd, cd, N );
-
-    cudaMemcpy( c, cd, sizeVec, cudaMemcpyDeviceToHost );
-
-    /**
-     * GPU Output.
-     */
-	printf("c[0]= %f\n", c[0]);
-	printf("c[1]= %f\n", c[1]);
-	printf("c[2]= %f\n", c[2]);
-	printf("c[3]= %f\n", c[3]);
-
-    cudaFree( ad ); 
-    cudaFree( bd ); 
-    cudaFree( cd );
-
-    delete[] a;
-    delete[] b;
-    delete[] c;
-
     runTest( argc, argv);
     // CUT_EXIT(argc, argv);
 	exit(EXIT_SUCCESS);
@@ -135,7 +62,7 @@ runTest( int argc, char** argv)
 
     // allocate host memory
     float* h_frequencies = (float*) malloc( memSize); // allocating input data
-    char* h_symbols = (char*) malloc( memSize); // allocating input data
+    char* h_symbols = (char*) malloc( sizeof(char)*numElements); // allocating input data
 
     // initalizing the memory with the elements
     for (unsigned int i = 0; i < numElements; ++i) 
@@ -150,7 +77,6 @@ runTest( int argc, char** argv)
 		h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
 		printf("i = %c\n", h_symbols[i]);
     }
-
 
     // allocate device memory for frequencies
     float* d_frequencies; // frequencies
@@ -202,6 +128,33 @@ runTest( int argc, char** argv)
         printf("Error destroying CUDPPPlan\n");
         exit(-1);
     }
+
+	numElements = h_odata[numElements-1];
+	memSize = sizeof( float) * numElements; // size of the memory
+	
+    // allocate device memory for exclusive scan output
+    float* h_uncompressedArr = (float*) malloc( memSize);
+    float* d_uncompressedArr; // final uncompressed proj idx
+    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompressedArr, memSize));
+
+    dim3 dimBlock(blocksize);
+    dim3 dimGrid(ceil(h_odata[numElements-1]/(float)blocksize));
+
+    initUncompressedArr<<<dimGrid, dimBlock>>>(d_uncompressedArr, numElements );
+
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, memSize, cudaMemcpyDeviceToHost));
+	
+	 /**
+	  * GPU Output.
+	  */
+	
+	printf("Total Elements = %d\n", numElements);
+	printf("c[0]= %f\n", h_uncompressedArr[0]);
+	printf("c[1]= %f\n", h_uncompressedArr[1]);
+	printf("c[2]= %f\n", h_uncompressedArr[2]);
+	printf("c[%d]= %f\n", numElements-1, h_uncompressedArr[numElements-1]);
+
+
 
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
