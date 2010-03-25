@@ -82,7 +82,7 @@ runTest( int argc, char** argv)
     config.op = CUDPP_ADD;
     config.datatype = CUDPP_FLOAT;
     config.algorithm = CUDPP_SCAN;
-    config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_EXCLUSIVE;
+    config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
     
     CUDPPHandle scanplan = 0;
     CUDPPResult result = cudppPlan(theCudpp, &scanplan, config, numElements, 1, 0);  
@@ -102,12 +102,12 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMemcpy( h_odata, d_odata, memSize,
                                 cudaMemcpyDeviceToHost) );
     // compute reference solution
-    float* reference = (float*) malloc( memSize);
-    computeSumScanGold( reference, h_idata, numElements, config);
-
-    // check result
-    CUTBoolean res = cutComparef( reference, h_odata, numElements);
-    printf( "Test %s\n", (1 == res) ? "PASSED" : "FAILED");
+    // float* reference = (float*) malloc( memSize);
+    // computeSumScanGold( reference, h_idata, numElements, config);
+    // 
+    // // check result
+    // CUTBoolean res = cutComparef( reference, h_odata, numElements);
+    // printf( "Test %s\n", (1 == res) ? "PASSED" : "FAILED");
 
 	for(size_t i = 0; i < numElements; ++i)
 	{
@@ -126,7 +126,7 @@ runTest( int argc, char** argv)
     
     free( h_idata);
     free( h_odata);
-    free( reference);
+    // free( reference);
     CUDA_SAFE_CALL(cudaFree(d_idata));
     CUDA_SAFE_CALL(cudaFree(d_odata));
 }
