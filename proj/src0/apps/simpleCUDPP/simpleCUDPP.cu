@@ -112,6 +112,8 @@ runTest( int argc, char** argv)
     // copy host memory to device
     CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
                                 cudaMemcpyHostToDevice) );
+
+    // allocate device memory for symbols
     char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
     // copy host memory to device
