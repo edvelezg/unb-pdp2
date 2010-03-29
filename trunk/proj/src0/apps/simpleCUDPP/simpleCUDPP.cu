@@ -127,7 +127,7 @@ runTest( int argc, char** argv)
     cudppCreate(&theCudpp);
 
 	// ======================================================================
-	// = Stage 1: Exclusive-scan of F gives you X =
+	// = Stage 1: Exclusive-scan of F
 	// ======================================================================
     CUDPPConfiguration config;
     config.op = CUDPP_ADD;
@@ -153,11 +153,6 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMemcpy( h_exclusiveScan, d_exclusiveScan, memSize,
                                 cudaMemcpyDeviceToHost) );
 
-	for(size_t i = 0; i < numElements; ++i)
-	{
-		printf("res: %f\n", h_exclusiveScan[i]);
-	}
-	
     result = cudppDestroyPlan(scanplan);
     if (CUDPP_SUCCESS != result)
     {
@@ -184,18 +179,6 @@ runTest( int argc, char** argv)
 	//CHANGED: Loop over U threads Each thread i writes a 0 to 
 	// item i in array A (creates a list A of length U where all elements are zero)
     initUncompressedArr<<<dimGrid, dimBlock>>>( d_uncompressedArr, numUncompElems);
-
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, uncompMemSize, cudaMemcpyDeviceToHost));
-	
-	 /**
-	  * GPU Output.
-	  */
-	
-	printf("Total Elements = %d\n", numUncompElems);
-	printf("c[0]= %f\n", h_uncompressedArr[0]);
-	printf("c[1]= %f\n", h_uncompressedArr[1]);
-	printf("c[2]= %f\n", h_uncompressedArr[2]);
-	printf("c[%d]= %f\n", numUncompElems-1, h_uncompressedArr[numUncompElems-1]);
 	
 	// ======================================================================
 	// = Stage 3
@@ -203,23 +186,6 @@ runTest( int argc, char** argv)
 	
     dim3 dimGrid2(ceil(numElements/(float)blocksize)); // should be on the compressed array
     writeChangeLocations<<<dimGrid2, dimBlock>>>( d_exclusiveScan, d_uncompressedArr, numElements);
-
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, uncompMemSize, cudaMemcpyDeviceToHost));
-
-	printf("Total Elements = %d\n", numUncompElems);
-	printf("c[0]= %f\n", h_uncompressedArr[0]);
-	printf("c[1]= %f\n", h_uncompressedArr[1]);
-	printf("c[2]= %f\n", h_uncompressedArr[2]);
-	printf("c[3]= %f\n", h_uncompressedArr[3]);
-	printf("c[4]= %f\n", h_uncompressedArr[4]);
-	printf("c[5]= %f\n", h_uncompressedArr[5]);
-	printf("c[6]= %f\n", h_uncompressedArr[6]);
-	printf("c[7]= %f\n", h_uncompressedArr[7]);
-	printf("c[8]= %f\n", h_uncompressedArr[8]);
-	printf("c[9]= %f\n", h_uncompressedArr[9]);
-	printf("c[10]= %f\n", h_uncompressedArr[10]);
-	printf("c[11]= %f\n", h_uncompressedArr[11]);
-	printf("c[%d]= %f\n", numUncompElems-1, h_uncompressedArr[numUncompElems-1]);
 	
 	// ======================================================================
 	// = Stage 4
@@ -242,17 +208,6 @@ runTest( int argc, char** argv)
 
     // Run the scan
     cudppScan(scanplan2, d_uncompressedArr, d_uncompressedArr, numUncompElems);
-
-    // allocate mem for the result on host side
-    // float* h_exclusiveScan = (float*) malloc( memSize);
-    // copy result from device to host
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, uncompMemSize,
-                                cudaMemcpyDeviceToHost) );
-
-	for(size_t i = 0; i < numUncompElems; ++i)
-	{
-		printf("res: %f\n", h_uncompressedArr[i]);
-	}
 	
     result2 = cudppDestroyPlan(scanplan2);
     if (CUDPP_SUCCESS != result2)
@@ -278,10 +233,9 @@ runTest( int argc, char** argv)
 	
 	for(size_t i = 0; i < numUncompElems; ++i)
 	{
-		printf("chars: %c\n", h_uncompSymbArr[i]);
+		printf("r[%d]: %c\n", i, h_uncompSymbArr[i]);
 	}
 	
-
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
     
