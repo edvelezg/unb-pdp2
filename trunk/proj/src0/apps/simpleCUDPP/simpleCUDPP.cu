@@ -145,7 +145,7 @@ runTest( int argc, char** argv)
         exit(-1);
     }
 
-	unsigned int numUncompElems = h_odata[numElements-1];
+	unsigned int numUncompElems = h_odata[numElements-1] + h_frequencies[numElements-1];
 	unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
 	
     // allocate device memory for exclusive scan output
