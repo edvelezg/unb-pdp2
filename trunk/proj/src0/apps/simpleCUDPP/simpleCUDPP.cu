@@ -154,7 +154,7 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompressedArr, uncompMemSize));
 
     dim3 dimBlock(blocksize);
-    dim3 dimGrid(ceil(h_odata[numElements-1]/(float)blocksize));
+    dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
 	
 	//CHANGED: Loop over U threads Each thread i writes a 0 to 
 	// item i in array A (creates a list A of length U where all elements are zero)
