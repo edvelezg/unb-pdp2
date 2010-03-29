@@ -50,14 +50,14 @@ void writeChangeLocations(float *x, float *c, int N )
 }
 
 __global__
-void uncompress(float *a, float *b, char *s, int N )
+void uncompress(float *a, char *b, char *s, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-	int idx = b[i];
+	int idx = (int) a[i];
 
     if ( i < N )
     {
-        a[i] = s[idx];
+        b[i] = s[idx];
     }
 }
 
@@ -86,23 +86,24 @@ runTest( int argc, char** argv)
 
     unsigned int numElements = 32; // number of elements 
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
+    unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
     // allocate host memory
     float* h_frequencies = (float*) malloc( memSize); // allocating input data
-    char* h_symbols = (char*) malloc( sizeof(char)*numElements); // allocating input data
+    char* h_symbols = (char*) malloc( symMemSize); // allocating input data
 
     // initalizing the memory with the elements
     for (unsigned int i = 0; i < numElements; ++i) 
     {
 		h_frequencies[i] = (float) (i+1);
-		printf("i = %f\n", h_frequencies[i]);
+		// printf("i = %f\n", h_frequencies[i]);
     }
 	
 	// allocating symbolic data
     for (unsigned int i = 0; i < numElements; ++i) 
     {
 		h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
-		printf("i = %c\n", h_symbols[i]);
+		// printf("i = %c\n", h_symbols[i]);
     }
 
     // allocate device memory for frequencies
@@ -110,6 +111,11 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_frequencies, memSize));
     // copy host memory to device
     CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
+                                cudaMemcpyHostToDevice) );
+    char* d_symbols; // attribute values
+    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
+    // copy host memory to device
+    CUDA_SAFE_CALL( cudaMemcpy( d_symbols, h_symbols, symMemSize,
                                 cudaMemcpyHostToDevice) );
 
     // allocate device memory for exclusive scan output
@@ -256,17 +262,37 @@ runTest( int argc, char** argv)
     }
     
 	// ======================================================================
-	// = Stage 4
+	// = Stage 5
 	// ======================================================================
+	unsigned int uncompSymMemSize = sizeof( char) * numUncompElems; // size of the memory
 	
+    // allocate device memory for exclusive scan output
+    char* h_uncompSymbArr = (char*) malloc( uncompSymMemSize);
+    char* d_uncompSymbArr; // final uncompressed proj idx
+    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbArr, uncompSymMemSize));
 
+    uncompress<<<dimGrid, dimBlock>>>( d_uncompressedArr, d_uncompSymbArr, d_symbols, numUncompElems);
+
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+                                cudaMemcpyDeviceToHost) );
+	
+	for(size_t i = 0; i < numUncompElems; ++i)
+	{
+		printf("chars: %c\n", h_uncompSymbArr[i]);
+	}
+	
 
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
     
     free( h_frequencies);
     free( h_exclusiveScan);
-    // free( reference);
+    free( h_uncompSymbArr);
+    free( h_uncompressedArr);
+    free( h_symbols);
     CUDA_SAFE_CALL(cudaFree(d_frequencies));
+    CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
+    CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
+    CUDA_SAFE_CALL(cudaFree(d_symbols));
     CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
 }
