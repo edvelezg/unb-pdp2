@@ -113,7 +113,7 @@ runTest( int argc, char** argv)
     config.op = CUDPP_ADD;
     config.datatype = CUDPP_FLOAT;
     config.algorithm = CUDPP_SCAN;
-    config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
+    config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_EXCLUSIVE;
     
     CUDPPHandle scanplan = 0;
     CUDPPResult result = cudppPlan(theCudpp, &scanplan, config, numElements, 1, 0);  
