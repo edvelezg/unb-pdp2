@@ -155,12 +155,12 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMemcpy( h_exclusiveScan, d_exclusiveScan, memSize,
                                 cudaMemcpyDeviceToHost) );
 
-    result = cudppDestroyPlan(scanplan);
-    if (CUDPP_SUCCESS != result)
-    {
-        printf("Error destroying CUDPPPlan\n");
-        exit(-1);
-    }
+    // result = cudppDestroyPlan(scanplan);
+    // if (CUDPP_SUCCESS != result)
+    // {
+    //     printf("Error destroying CUDPPPlan\n");
+    //     exit(-1);
+    // }
 
 	// ======================================================================
 	// = Stage 2: Loop over U threads Each thread i writes a 0 to item i in 
@@ -198,8 +198,8 @@ runTest( int argc, char** argv)
     config.algorithm = CUDPP_SCAN;
     config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
     
-    CUDPPHandle scanplan2 = 0;
-	result = cudppPlan(theCudpp, &scanplan2, config, numUncompElems, 1, 0);  
+    // CUDPPHandle scanplan2 = 0;
+	result = cudppPlan(theCudpp, &scanplan, config, numUncompElems, 1, 0);  
 
     if (CUDPP_SUCCESS != result)
     {
@@ -208,9 +208,9 @@ runTest( int argc, char** argv)
     }
 
     // Run the scan
-    cudppScan(scanplan2, d_uncompressedArr, d_uncompressedArr, numUncompElems);
+    cudppScan(scanplan, d_uncompressedArr, d_uncompressedArr, numUncompElems);
 	
-    result = cudppDestroyPlan(scanplan2);
+    result = cudppDestroyPlan(scanplan);
     if (CUDPP_SUCCESS != result)
     {
         printf("Error destroying CUDPPPlan\n");
