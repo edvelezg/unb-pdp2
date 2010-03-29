@@ -199,7 +199,7 @@ runTest( int argc, char** argv)
     config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
     
     CUDPPHandle scanplan2 = 0;
-    CUDPPResult result2 = cudppPlan(theCudpp, &scanplan2, config, numUncompElems, 1, 0);  
+	result = cudppPlan(theCudpp, &scanplan2, config, numUncompElems, 1, 0);  
 
     if (CUDPP_SUCCESS != result)
     {
@@ -210,8 +210,8 @@ runTest( int argc, char** argv)
     // Run the scan
     cudppScan(scanplan2, d_uncompressedArr, d_uncompressedArr, numUncompElems);
 	
-    result2 = cudppDestroyPlan(scanplan2);
-    if (CUDPP_SUCCESS != result2)
+    result = cudppDestroyPlan(scanplan2);
+    if (CUDPP_SUCCESS != result)
     {
         printf("Error destroying CUDPPPlan\n");
         exit(-1);
