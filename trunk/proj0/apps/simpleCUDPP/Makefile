@@ -6,9 +6,10 @@
 
 ###############################################################################
 # SOURCE VARS
+
+BINDIR := .
 EXECUTABLE	:= simpleCUDPP
 
-CCFILES :=	scan_gold.cpp
 CUFILES :=	simpleCUDPP.cu
 
 INCLUDES := -I../../cudpp/include
