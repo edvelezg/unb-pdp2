@@ -193,14 +193,13 @@ runTest( int argc, char** argv)
 	// = Stage 4
 	// ======================================================================
 	
-	CUDPPConfiguration config2;
-    config2.op = CUDPP_ADD;
-    config2.datatype = CUDPP_FLOAT;
-    config2.algorithm = CUDPP_SCAN;
-    config2.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
+    config.op = CUDPP_ADD;
+    config.datatype = CUDPP_FLOAT;
+    config.algorithm = CUDPP_SCAN;
+    config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_INCLUSIVE;
     
     CUDPPHandle scanplan2 = 0;
-    CUDPPResult result2 = cudppPlan(theCudpp, &scanplan2, config2, numUncompElems, 1, 0);  
+    CUDPPResult result2 = cudppPlan(theCudpp, &scanplan2, config, numUncompElems, 1, 0);  
 
     if (CUDPP_SUCCESS != result)
     {
