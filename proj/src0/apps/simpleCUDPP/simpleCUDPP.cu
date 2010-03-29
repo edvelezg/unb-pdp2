@@ -43,13 +43,21 @@ void writeChangeLocations(float *x, float *c, int N )
     float Cvalue = 1.0;
 	int idx = x[i];
 
-    /*
-    * Each thread will perform the dot product between the row of the matrix 
-    * and the vector that is being multiplied. 
-    */
     if ( i < N && idx != 0)
     {
         c[idx] = Cvalue;
+    }
+}
+
+__global__
+void uncompress(float *a, float *b, char *s, int N )
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int idx = b[i];
+
+    if ( i < N )
+    {
+        a[i] = s[idx];
     }
 }
 
@@ -247,6 +255,11 @@ runTest( int argc, char** argv)
         exit(-1);
     }
     
+	// ======================================================================
+	// = Stage 4
+	// ======================================================================
+	
+
 
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
