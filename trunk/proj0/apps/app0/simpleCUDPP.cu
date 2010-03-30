@@ -84,7 +84,13 @@ runTest( int argc, char** argv)
 {
     CUT_DEVICE_INIT(argc, argv);
 
-    unsigned int numElements = 320; // number of elements 
+    if ( argc != 2 )
+    {
+        cout<<"usage: "<< argv[0] <<" <size n>\n";
+        return EXIT_FAILURE;
+    }
+
+    unsigned int numElements = atoi(argv[1]); // number of elements 
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
