@@ -84,7 +84,13 @@ runTest( int argc, char** argv)
 {
     CUT_DEVICE_INIT(argc, argv);
 
-    unsigned int numElements = 320; // number of elements 
+    if ( argc != 2 )
+    {
+        cout<<"usage: "<< argv[0] <<" <size n>\n";
+        return EXIT_FAILURE;
+    }
+
+    unsigned int numElements = atoi(argv[1]); // number of elements 
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
@@ -108,7 +114,7 @@ runTest( int argc, char** argv)
 		{
 			// printf("sym[%d] = %c\n", j, h_symbols[i]);
 			h_uncompSymbols[idx] = h_symbols[i];
-			printf("sym[%d] = %c\n", idx, h_symbols[i]);
+			// printf("sym[%d] = %c\n", idx, h_symbols[i]);
 			++idx;
 		}
     }
