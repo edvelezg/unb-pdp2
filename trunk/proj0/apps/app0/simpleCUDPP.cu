@@ -82,15 +82,16 @@ main( int argc, char** argv)
 void
 runTest( int argc, char** argv) 
 {
-    CUT_DEVICE_INIT(argc, argv);
-
-    if ( argc != 2 )
+	if ( argc != 2 )
     {
-        cout<<"usage: "<< argv[0] <<" <size n>\n";
-        return EXIT_FAILURE;
+		printf("usage: %s <size n>\n", argv[0]);
+		exit(-1);
     }
 
-    unsigned int numElements = atoi(argv[1]); // number of elements 
+    int numElements = atoi(argv[1]); // number of elements 
+    
+    // CUT_DEVICE_INIT(argc, argv);
+
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
