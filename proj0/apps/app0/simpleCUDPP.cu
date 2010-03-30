@@ -221,13 +221,13 @@ runTest( int argc, char** argv)
 
     uncompress<<<dimGrid, dimBlock>>>( d_uncompressedArr, d_uncompSymbArr, d_symbols, numUncompElems);
 
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
-                                cudaMemcpyDeviceToHost) );
-	
-	for(size_t i = 0; i < numUncompElems; ++i)
-	{
-		printf("r[%d]: %c\n", i, h_uncompSymbArr[i]);
-	}
+	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+	//                                 cudaMemcpyDeviceToHost) );
+	// 
+	// for(size_t i = 0; i < numUncompElems; ++i)
+	// {
+	// 	printf("r[%d]: %c\n", i, h_uncompSymbArr[i]);
+	// }
 	
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
