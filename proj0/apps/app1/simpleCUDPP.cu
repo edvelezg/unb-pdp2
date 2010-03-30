@@ -101,12 +101,15 @@ runTest( int argc, char** argv)
     }
 
     // initalizing the memory with the elements
+	unsigned int idx = 0;
     for (unsigned int i = 0; i < numElements; ++i) 
     {
-		for(size_t j = 0; j < i+1; ++j)
+		for(unsigned int j = 0; j < i+1; ++j)
 		{
-			printf("sym[%d] = %c\n", j, h_symbols[i]);
-			
+			// printf("sym[%d] = %c\n", j, h_symbols[i]);
+			h_uncompSymbols[idx] = h_symbols[i];
+			printf("sym[%d] = %c\n", idx, h_symbols[i]);
+			++idx;
 		}
     }
 	
@@ -125,5 +128,6 @@ runTest( int argc, char** argv)
     cudppDestroy(theCudpp);
     
     free( h_symbols);
-    CUDA_SAFE_CALL(cudaFree(d_symbols));
+    free( h_uncompSymbols);
+    CUDA_SAFE_CALL(cudaFree(d_uncompSymbols));
 }
