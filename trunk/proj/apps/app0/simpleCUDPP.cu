@@ -15,7 +15,7 @@
 /**
  * Number of threads per block
  */
-const int blocksize = 32;
+const int blocksize = 512;
 time_t seconds;
 
 __global__
@@ -157,9 +157,9 @@ runTest( int argc, char** argv)
     cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements);
 
     // allocate mem for the result on host side
-    float* h_exclusiveScan = (float*) malloc( memSize);
+    float* h_exclusiveScan = (float*) malloc( sizeof(float));
     // copy result from device to host
-    CUDA_SAFE_CALL( cudaMemcpy( h_exclusiveScan, d_exclusiveScan, memSize,
+    CUDA_SAFE_CALL( cudaMemcpy( &h_exclusiveScan[0], &d_exclusiveScan[numElements-1], sizeof(float),
                                 cudaMemcpyDeviceToHost) );
 
 	// ======================================================================
@@ -167,7 +167,7 @@ runTest( int argc, char** argv)
 	// = array A (creates a list A of length U where all elements are zero)
 	// ======================================================================
 
-	unsigned int numUncompElems = h_exclusiveScan[numElements-1] + h_frequencies[numElements-1];
+	unsigned int numUncompElems = h_exclusiveScan[0] + h_frequencies[numElements-1];
 	unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
 	
     // allocate device memory for exclusive scan output
