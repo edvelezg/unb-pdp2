@@ -161,7 +161,7 @@ runTest( int argc, char** argv)
     // copy result from device to host
     CUDA_SAFE_CALL( cudaMemcpy( &h_exclusiveScan[0], &d_exclusiveScan[numElements-1], sizeof(float),
                                 cudaMemcpyDeviceToHost) );
-
+							
 	// ======================================================================
 	// = Stage 2: Loop over U threads Each thread i writes a 0 to item i in 
 	// = array A (creates a list A of length U where all elements are zero)
@@ -169,6 +169,9 @@ runTest( int argc, char** argv)
 
 	unsigned int numUncompElems = h_exclusiveScan[0] + h_frequencies[numElements-1];
 	unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
+	
+	printf("last scan elem: %f\n", h_exclusiveScan[0]);
+	printf("total uncomped elems: %d\n", numUncompElems);
 	
     // allocate device memory for exclusive scan output
     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
