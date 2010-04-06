@@ -15,7 +15,7 @@
 /**
  * Number of threads per block
  */
-// const int blocksize = 32;
+// const int blocksize = 512;
 time_t seconds;
 
 __global__
@@ -90,10 +90,12 @@ runTest( int argc, char** argv)
 
     int numElements = atoi(argv[1]); // number of elements 
 
-    CUT_DEVICE_INIT(argc, argv);
+    // CUT_DEVICE_INIT(argc, argv);
 
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
+
+	printf("number of elems: %d\n", numUncomElems);
 
     // allocate host memory
     char* h_symbols = (char*) malloc( memSize); // allocating input data
