@@ -8,9 +8,9 @@
 # SOURCE VARS
 
 BINDIR := .
-EXECUTABLE	:= simpleCUDPP
+EXECUTABLE	:= uncompressedIdx
 
-CUFILES :=	simpleCUDPP.cu
+CUFILES :=	uncompressedIdx.cu
 
 INCLUDES := -I../../cudpp/include
 
