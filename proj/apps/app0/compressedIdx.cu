@@ -170,8 +170,8 @@ runTest( int argc, char** argv)
 	unsigned int numUncompElems = h_exclusiveScan[0] + h_frequencies[numElements-1];
 	unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
 	
-	printf("last scan elem: %f\n", h_exclusiveScan[0]);
-	printf("total uncomped elems: %d\n", numUncompElems);
+	// printf("last scan elem: %f\n", h_exclusiveScan[0]);
+	printf("total uncompressed elements: %d\n", numUncompElems);
 	
     // allocate device memory for exclusive scan output
     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
