@@ -64,25 +64,15 @@ void uncompress(float *a, char *b, char *s, int N )
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
 ////////////////////////////////////////////////////////////////////////////////
-void runTest( int argc, char** argv);
+void runTest( int numElements );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
-int
-main( int argc, char** argv) 
+int main( int argc, char** argv) 
 {
-    runTest( argc, argv);
-    // CUT_EXIT(argc, argv);
-	exit(EXIT_SUCCESS);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//! Run a simple test for CUDA
-////////////////////////////////////////////////////////////////////////////////
-void
-runTest( int argc, char** argv) 
-{
+	clock_t start;
+	
 	if ( argc != 2 )
     {
 		printf("usage: %s <size n>\n", argv[0]);
@@ -90,9 +80,27 @@ runTest( int argc, char** argv)
     }
 
     int numElements = atoi(argv[1]); // number of elements 
-
-    // CUT_DEVICE_INIT(argc, argv);
-
+	
+    
+	FILE *file;
+	
+	file = fopen("times.txt","a+"); /* apend file (add text to */
+	start = clock();
+	
+	runTest( numElements );
+    
+	fprintf(file,"%d time: %lf\n", numElements , ((double)clock()-start)/CLOCKS_PER_SEC); /*writes*/
+    fclose(file); /*done!*/
+    
+    // CUT_EXIT(argc, argv);
+	exit(EXIT_SUCCESS);
+}
+////////////////////////////////////////////////////////////////////////////////
+//! Run a simple test for CUDA
+////////////////////////////////////////////////////////////////////////////////
+void
+runTest( int numElements ) 
+{
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
