@@ -3,7 +3,7 @@
 // F,S,X) and U is the length of the uncompressed sequence. (You can get
 // U by reducing [sum] F.)
 
-//CHANGED: Exclusive-scan of F gives you X
+//CHANGED: Exclusive-scan of F gives you Xl
 //CHANGED: Loop over U threads Each thread i writes a 0 to item i in array A (creates a list A of length U where all elements are zero)
 //CHANGED: Loop over C threads
 //  Each thread i writes a 1 to item X[i] in array A UNLESS X[i] == 0
@@ -16,6 +16,7 @@
 // unfortunately.
 
 // OLD ALGO
-
 // TODO: Loop over i threads to N in Array X
 // TODO: each tread writes from x[i] to x[i+1]
+
+// Think of other ways to create synthetic tests.
