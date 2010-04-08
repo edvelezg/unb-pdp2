@@ -70,7 +70,7 @@ runTest( int argc, char** argv)
     CUT_DEVICE_INIT(argc, argv);
 
     unsigned int numElements = 32; // number of elements
-    unsigned int memSize = sizeof( float) * numElements; // size of the memory
+    unsigned int memSize = sizeof( float) * (numElements + 1); // size of the memory
 
 // allocate host memory
     float* h_frequencies = (float*) malloc( memSize); // allocating input data
@@ -80,9 +80,10 @@ runTest( int argc, char** argv)
     for ( unsigned int i = 0; i < numElements; ++i )
     {
         h_frequencies[i] = (float) (i+1);
-        printf("i = %f\n", h_frequencies[i]);
+        // printf("i = %f\n", h_frequencies[i]);
     }
-
+	h_frequencies[numElements] = 0; // Nice lil hack :)
+	
 // allocating symbolic data
     for ( unsigned int i = 0; i < numElements; ++i )
     {
@@ -112,7 +113,7 @@ runTest( int argc, char** argv)
     config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_EXCLUSIVE;
 
     CUDPPHandle scanplan = 0;
-    CUDPPResult result = cudppPlan(theCudpp, &scanplan, config, numElements, 1, 0);
+    CUDPPResult result = cudppPlan(theCudpp, &scanplan, config, numElements+1, 1, 0);
 
     if ( CUDPP_SUCCESS != result )
     {
@@ -121,7 +122,7 @@ runTest( int argc, char** argv)
     }
 
 // Run the scan
-    cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements);
+    cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements+1);
 
 // allocate mem for the result on host side
     float* h_odata = (float*) malloc( memSize);
@@ -129,44 +130,45 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMemcpy( h_odata, d_exclusiveScan, memSize,
                                 cudaMemcpyDeviceToHost) );
 
-// for(size_t i = 0; i < numElements; ++i)
-// {
-// printf("res: %f\n", h_odata[i]);
-// }
+	for(size_t i = 0; i < numElements + 1; ++i)
+	{
+		printf("res: %f\n", h_odata[i]);
+	}
 
     result = cudppDestroyPlan(scanplan);
+
     if ( CUDPP_SUCCESS != result )
     {
         printf("Error destroying CUDPPPlan\n");
         exit(-1);
     }
 
-    unsigned int numUncompElems = h_odata[numElements-1] + h_frequencies[numElements-1];
-    unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
-
-// allocate device memory for exclusive scan output
-    float* h_uncompressedArr = (float*) malloc( uncompMemSize);
-    float* d_uncompressedArr; // final uncompressed proj idx
-    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompressedArr, uncompMemSize));
-
-    dim3 dimBlock(blocksize);
-    dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
-
-//CHANGED: Loop over U threads Each thread i writes a 0 to
-// item i in array A (creates a list A of length U where all elements are zero)
-    initUncompressedArr<<<dimGrid, dimBlock>>>( d_uncompressedArr, numUncompElems);
-
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, uncompMemSize, cudaMemcpyDeviceToHost));
+//     unsigned int numUncompElems = h_odata[numElements-1] + h_frequencies[numElements-1];
+//     unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
+// 
+// // allocate device memory for exclusive scan output
+//     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
+//     float* d_uncompressedArr; // final uncompressed proj idx
+//     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompressedArr, uncompMemSize));
+// 
+//     dim3 dimBlock(blocksize);
+//     dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
+// 
+// //CHANGED: Loop over U threads Each thread i writes a 0 to
+// // item i in array A (creates a list A of length U where all elements are zero)
+//     initUncompressedArr<<<dimGrid, dimBlock>>>( d_uncompressedArr, numUncompElems);
+// 
+//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompressedArr, d_uncompressedArr, uncompMemSize, cudaMemcpyDeviceToHost));
 
 /**
 * GPU Output.
 */
 
-    printf("Total Elements = %d\n", numUncompElems);
-    printf("c[0]= %f\n", h_uncompressedArr[0]);
-    printf("c[1]= %f\n", h_uncompressedArr[1]);
-    printf("c[2]= %f\n", h_uncompressedArr[2]);
-    printf("c[%d]= %f\n", numUncompElems-1, h_uncompressedArr[numUncompElems-1]);
+    // printf("Total Elements = %d\n", numUncompElems);
+    // printf("c[0]= %f\n", h_uncompressedArr[0]);
+    // printf("c[1]= %f\n", h_uncompressedArr[1]);
+    // printf("c[2]= %f\n", h_uncompressedArr[2]);
+    // printf("c[%d]= %f\n", numUncompElems-1, h_uncompressedArr[numUncompElems-1]);
 
 // dim3 dimGrid2(ceil(h_odata[numElements-1]/(float)blocksize));
 
