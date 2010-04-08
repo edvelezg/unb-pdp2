@@ -91,7 +91,6 @@ runTest( int argc, char** argv)
     int numElements = atoi(argv[1]); // number of elements 
     
     // CUT_DEVICE_INIT(argc, argv);
-
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
@@ -112,6 +111,12 @@ runTest( int argc, char** argv)
 		h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
 		// printf("i = %c\n", h_symbols[i]);
     }
+
+	cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float elapsedTime[4]; // Init, CPU runtime, memcpy, GPU runtime.
+    cudaEventRecord(start, 0);
 
     // allocate device memory for frequencies
     float* d_frequencies; // frequencies
@@ -242,14 +247,21 @@ runTest( int argc, char** argv)
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
     
-    free( h_frequencies);
-    free( h_exclusiveScan);
-    free( h_uncompSymbArr);
-    free( h_uncompressedArr);
-    free( h_symbols);
     CUDA_SAFE_CALL(cudaFree(d_frequencies));
     CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
     CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
     CUDA_SAFE_CALL(cudaFree(d_symbols));
     CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
+
+    cudaEventRecord(stop,0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsedTime[0], start, stop);
+	printf("GPU elapsed time: %f\n", elapsedTime[0]); 
+
+    free( h_frequencies);
+    free( h_exclusiveScan);
+    free( h_uncompSymbArr);
+    free( h_uncompressedArr);
+    free( h_symbols);
+
 }
