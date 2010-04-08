@@ -63,6 +63,7 @@ void uncompress(float *a, char *b, char *s, int N )
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
+////////////////////////////////////////////////////////////////////////////////
 void runTest( int argc, char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +102,6 @@ runTest( int argc, char** argv)
     char* h_symbols = (char*) malloc( memSize); // allocating input data
     char* h_uncompSymbols = (char*) malloc( numUncomElems); // allocating input data
 
-
 	// allocating symbolic data
     for (unsigned int i = 0; i < numElements; ++i) 
     {
@@ -126,17 +126,23 @@ runTest( int argc, char** argv)
     char* d_uncompSymbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, numUncomElems));
     // copy host memory to device
+
+	cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float elapsedTime[4]; // Init, CPU runtime, memcpy, GPU runtime.
+    cudaEventRecord(start, 0);
+
     CUDA_SAFE_CALL( cudaMemcpy( d_uncompSymbols, h_uncompSymbols, memSize,
                                 cudaMemcpyHostToDevice) );
 
-    // Initialize the CUDPP Library
-    CUDPPHandle theCudpp;
-    cudppCreate(&theCudpp);
-		
-    // shut down the CUDPP library
-    cudppDestroy(theCudpp);
-    
+	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
+	
+	cudaEventRecord(stop,0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsedTime[0], start, stop);
+	printf("GPU elapsed time: %f\n", elapsedTime[0]); 
+
     free( h_symbols);
     free( h_uncompSymbols);
-    CUDA_SAFE_CALL(cudaFree(d_uncompSymbols));
 }
