@@ -5,6 +5,7 @@
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
 #include <math.h>
 
@@ -63,25 +64,15 @@ void uncompress(float *a, char *b, char *s, int N )
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
-void runTest( int argc, char** argv);
+void runTest( int numElements );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
-int
-main( int argc, char** argv) 
+int main( int argc, char** argv) 
 {
-    runTest( argc, argv);
-    // CUT_EXIT(argc, argv);
-	exit(EXIT_SUCCESS);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//! Run a simple test for CUDA
-////////////////////////////////////////////////////////////////////////////////
-void
-runTest( int argc, char** argv) 
-{
+	clock_t start;
+	
 	if ( argc != 2 )
     {
 		printf("usage: %s <size n>\n", argv[0]);
@@ -89,8 +80,28 @@ runTest( int argc, char** argv)
     }
 
     int numElements = atoi(argv[1]); // number of elements 
+	
     
-    // CUT_DEVICE_INIT(argc, argv);
+	FILE *file;
+	
+	file = fopen("times.txt","a+"); /* apend file (add text to */
+	start = clock();
+	
+	runTest( numElements );
+    
+	fprintf(file,"%d time: %lf\n", numElements , ((double)clock()-start)/CLOCKS_PER_SEC); /*writes*/
+    fclose(file); /*done!*/
+    
+    // CUT_EXIT(argc, argv);
+	exit(EXIT_SUCCESS);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Run a simple test for CUDA
+////////////////////////////////////////////////////////////////////////////////
+void runTest( int numElements )
+{
+    
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
@@ -182,6 +193,8 @@ runTest( int argc, char** argv)
     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
     float* d_uncompressedArr; // final uncompressed proj idx
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompressedArr, uncompMemSize));
+    CUDA_SAFE_CALL(cudaFree(d_frequencies));
+
 
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
@@ -196,7 +209,8 @@ runTest( int argc, char** argv)
 	
     dim3 dimGrid2(ceil(numElements/(float)blocksize)); // should be on the compressed array
     writeChangeLocations<<<dimGrid2, dimBlock>>>( d_exclusiveScan, d_uncompressedArr, numElements);
-	
+	CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
+    
 	// ======================================================================
 	// = Stage 4
 	// ======================================================================
@@ -247,7 +261,6 @@ runTest( int argc, char** argv)
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
     
-    CUDA_SAFE_CALL(cudaFree(d_frequencies));
     CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
     CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
     CUDA_SAFE_CALL(cudaFree(d_symbols));
