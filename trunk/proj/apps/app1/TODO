@@ -5,12 +5,17 @@
 
 //CHANGED: Exclusive-scan of F gives you X
 //CHANGED: Loop over U threads Each thread i writes a 0 to item i in array A (creates a list A of length U where all elements are zero)
-//FIXME: Loop over C threads
+//CHANGED: Loop over C threads
 //  Each thread i writes a 1 to item X[i] in array A UNLESS X[i] == 0
 //    (A is now [0 0 0 1 0 0 0 0 0 0 1 0 0])
-//FIXME: Inclusive-scan A gives you B
+//CHANGED: Inclusive-scan A gives you B
 //    (B is now [0 0 0 1 1 1 1 1 1 1 2 2 2])
-//FIXME: Loop over U threads: Each thread i reads item S[B[i]] into output
+//CHANGED: Loop over U threads: Each thread i reads item S[B[i]] into output
 // 
 // It's load balanced nicely, but takes a lot of kernels to do it,
 // unfortunately.
+
+// OLD ALGO
+
+// TODO: Loop over i threads to N in Array X
+// TODO: each tread writes from x[i] to x[i+1]
