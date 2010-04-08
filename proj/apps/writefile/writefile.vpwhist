@@ -13,31 +13,31 @@ writefile.vpj=,Debug
   + Other Files
 scroll:0
 [State]
-SCREEN: 1680 1050 745 -8 840 990 0 0 N 0 0 0 0 774 816 0
-CWD: ..\writefile
+SCREEN: 1680 1050 745 -8 840 990 0 0 M 0 0 0 0 1630 832 0
+CWD: ..\app2
+BUFFER: BN="\CUDA\include\common_functions.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=-1 CL="" SC="" SCE= SCU=
+VIEW: LN=.2534 CL=1 LE=0 CX=1 CY=22 WI=5 BI=13 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="writefile.c"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
-VIEW: LN=.519 CL=2 LE=0 CX=2 CY=16 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 599 571 -1 -1 M  WF=0 WT=1 ",,,"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C/C++	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=1 LCF=0 CAPS=0 E=0 ESBU2=1 CL="" SC="" SCE= SCU=
+VIEW: LN=.611 CL=2 LE=0 CX=2 CY=29 WI=5 BI=12 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 815 832 -1 -1 M  WF=0 WT=3 ",,,"
 BUFFER: BN="writefile.c"
-VIEW: LN=.419 CL=32 LE=0 CX=32 CY=14 WI=161 BI=17 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.611 CL=2 LE=0 CX=2 CY=29 WI=78 BI=12 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-..\..\..\..\..\OS\cs4405winter2010-read-only\fifo.c
-..\..\..\..\..\OS\cs4405winter2010-read-only\os.c
-..\..\..\..\..\OS\cs4405winter2010-read-only\process.c
-..\..\..\..\..\OS\cs4405winter2010-read-only\process.h
-..\..\..\..\..\OS\cs4405winter2010-read-only\semaphore.h
-..\..\..\..\..\OS\cs4405winter2010-read-only\semaphore.c
 ..\..\..\..\..\OS\cs4405winter2010-read-only\test.c
 Debug\file.txt
+..\..\..\..\..\..\..\Downloads\Timer.hpp
+file.txt
+Timer.hpp
+\MinGW\include\time.h
+times.txt
+Debug\times.txt
 writefile.c
 DEBUG: 0 0 0 0 3 0 gdb
 printf
 strcpy
 std::*
 DEBUG2: 0
-PROJECT_CACHE: 1
-20100408185704252 2 C:\Users\Viper\Documents\UNB-Courses\PDP2\unb-pdp2\proj\apps\writefile\writefile.vpj
-writefile.c
-Makefile
+PROJECT_CACHE: 0
 TBCLASS: 0 0
