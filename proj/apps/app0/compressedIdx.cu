@@ -262,14 +262,14 @@ void runTest( int numElements )
     cudppDestroy(theCudpp);
     
     CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
-    CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
     CUDA_SAFE_CALL(cudaFree(d_symbols));
-    CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&elapsedTime[0], start, stop);
 	printf("GPU elapsed time: %f\n", elapsedTime[0]); 
+	
+	CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
 
     free( h_frequencies);
     free( h_exclusiveScan);
