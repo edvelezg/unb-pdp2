@@ -1,7 +1,3 @@
- /*
- * This is a basic example of how to use the CUDPP library.
- */
-
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>

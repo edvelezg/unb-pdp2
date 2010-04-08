@@ -14,9 +14,6 @@ int main()
     FILE *file;
     int i;
 
-    char szInput [256];
-    double dif;
-
     file = fopen("times.txt","a+"); /* apend file (add text to
     a file or create a file if it does not exist.*/
     for ( i = 0; i < 10; ++i )
