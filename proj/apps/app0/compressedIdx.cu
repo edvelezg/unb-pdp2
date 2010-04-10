@@ -1,7 +1,7 @@
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
+#include <sys/time.h>
 #include <string.h>
 #include <math.h>
 
@@ -58,6 +58,12 @@ void uncompress(float *a, char *b, char *s, int N )
     }
 }
 
+double wallClockTime() { //time in seconds
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (1000000*tv.tv_sec+tv.tv_usec)/1.0e6;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
 void runTest( int numElements );
@@ -67,7 +73,7 @@ void runTest( int numElements );
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char** argv) 
 {
-	clock_t start;
+	double wallTime = wallClockTime();
 	
 	if ( argc != 2 )
     {
@@ -81,11 +87,13 @@ int main( int argc, char** argv)
 	FILE *file;
 	
 	file = fopen("times.txt","a+"); /* apend file (add text to */
-	start = clock();
+	// start = clock();
 	
 	runTest( numElements );
     
-	fprintf(file,"%d time: %lf\n", numElements , ((double)clock()-start)/CLOCKS_PER_SEC); /*writes*/
+	wallTime = wallClockTime() - wallTime;
+	
+	fprintf(file,"%d time: %lf\n",numElements , wallTime); /*writes*/
     fclose(file); /*done!*/
     
     // CUT_EXIT(argc, argv);
@@ -97,6 +105,11 @@ int main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 void runTest( int numElements )
 {
+	/* For timing purposes */
+	cudaEvent_t start, stop;
+	float elapsedTime[4];
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
     
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
@@ -118,12 +131,6 @@ void runTest( int numElements )
 		h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
 		// printf("i = %c\n", h_symbols[i]);
     }
-
-	cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    float elapsedTime[4]; // Init, CPU runtime, memcpy, GPU runtime.
-    cudaEventRecord(start, 0);
 
     // allocate device memory for frequencies
     float* d_frequencies; // frequencies
@@ -184,7 +191,7 @@ void runTest( int numElements )
 	
 	// printf("last scan elem: %f\n", h_exclusiveScan[0]);
 	printf("total uncompressed elements: %d\n", numUncompElems);
-	
+		
     // allocate device memory for exclusive scan output
     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
     float* d_uncompressedArr; // final uncompressed proj idx
@@ -194,18 +201,33 @@ void runTest( int numElements )
 
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
+
+	cudaEventRecord( start, 0 );
+	initUncompressedArr<<<dimGrid, dimBlock>>>( d_uncompressedArr, numUncompElems);
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[0], start, stop );
+	printf("Time to complete Stage 2: %f\n", elapsedTime[0]);
 		
-	//CHANGED: Loop over U threads Each thread i writes a 0 to 
-	// item i in array A (creates a list A of length U where all elements are zero)
-    initUncompressedArr<<<dimGrid, dimBlock>>>( d_uncompressedArr, numUncompElems);
 	
 	// ======================================================================
 	// = Stage 3
 	// ======================================================================
 	
     dim3 dimGrid2(ceil(numElements/(float)blocksize)); // should be on the compressed array
+	
+	cudaEventRecord( start, 0 );
     writeChangeLocations<<<dimGrid2, dimBlock>>>( d_exclusiveScan, d_uncompressedArr, numElements);
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[1], start, stop );
+	printf("Time to complete Stage 3: %f\n", elapsedTime[1]);
+
 	CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
+	
+	
     
 	// ======================================================================
 	// = Stage 4
@@ -224,8 +246,16 @@ void runTest( int numElements )
         exit(-1);
     }
 
+	cudaEventRecord( start, 0 );
+	
     // Run the scan
     cudppScan(scanplan, d_uncompressedArr, d_uncompressedArr, numUncompElems);
+
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[2], start, stop );
+	printf("Time to complete Stage 4: %f\n", elapsedTime[2]);
 	
     result = cudppDestroyPlan(scanplan);
     if (CUDPP_SUCCESS != result)
@@ -244,7 +274,16 @@ void runTest( int numElements )
     char* d_uncompSymbArr; // final uncompressed proj idx
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbArr, uncompSymMemSize));
 
+	cudaEventRecord( start, 0 );
+
     uncompress<<<dimGrid, dimBlock>>>( d_uncompressedArr, d_uncompSymbArr, d_symbols, numUncompElems);
+
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[3], start, stop );
+	printf("Time to complete Stage 5: %f\n", elapsedTime[3]);
+
 
 	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
 	//                                 cudaMemcpyDeviceToHost) );
@@ -259,11 +298,6 @@ void runTest( int numElements )
     
     CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
     CUDA_SAFE_CALL(cudaFree(d_symbols));
-
-    cudaEventRecord(stop,0);
-    cudaEventSynchronize(stop);
-    cudaEventElapsedTime(&elapsedTime[0], start, stop);
-	printf("GPU elapsed time: %f\n", elapsedTime[0]); 
 	
 	CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
 
@@ -273,6 +307,9 @@ void runTest( int numElements )
     free( h_uncompressedArr);
     free( h_symbols);
 
+	/* Destroy the timer */
+	cudaEventDestroy( start ); 
+	cudaEventDestroy( stop );
 }
 
 //  Kernel 1:  get X as Exclusive-scan of F
