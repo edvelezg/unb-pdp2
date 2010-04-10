@@ -274,3 +274,20 @@ void runTest( int numElements )
     free( h_symbols);
 
 }
+
+//  Kernel 1:  get X as Exclusive-scan of F
+//
+//  Kernel 2: for i = 0 to U
+//              forall k in parallel do
+//                  write 0 to item i in array A
+//
+//  Kernel 3: for i = 0 to C
+//              forall k in parallel do
+//                  write a 1 to item X[i] in array A 
+//
+//  Kernel 4: get B as Inclusive-scan of array A 
+//
+//  Kernel 5: for i = 0 to U
+//              forall k in parallel do
+//                  write item S[B[i]] to Uncompressed Index 
+
