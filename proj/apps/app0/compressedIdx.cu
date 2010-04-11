@@ -86,7 +86,7 @@ int main( int argc, char** argv)
     
 	FILE *file;
 	
-	file = fopen("times.txt","a+"); /* apend file (add text to */
+	file = fopen("CPUTimes.txt","a+"); /* apend file (add text to */
 	// start = clock();
 	
 	runTest( numElements );
@@ -102,6 +102,9 @@ int main( int argc, char** argv)
 
 void runTest( int numElements )
 {
+	FILE *file;
+	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
+	
 	/* For timing purposes */
 	cudaEvent_t start, stop;
 	float elapsedTime[7];
@@ -148,7 +151,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[0], start, stop );
-	printf("Time to copy compressed: %f\n", elapsedTime[0]);
+	fprintf(file, "Time to copy compressed: %f\n", elapsedTime[0]);
 
     // allocate device memory for exclusive scan output
     float* d_exclusiveScan; // exclusive scan output
@@ -188,7 +191,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[1], start, stop );
-	printf("Time to complete Stage 1: %f\n", elapsedTime[1]);
+	fprintf(file, "Time to complete Stage 1: %f\n", elapsedTime[1]);
 	
 	cudaEventRecord( start, 0 );
     
@@ -198,7 +201,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[2], start, stop );
-	printf("Time to complete Insignificant Copy: %f\n", elapsedTime[2]);
+	fprintf(file, "Time to complete Insignificant Copy: %f\n", elapsedTime[2]);
 	
 							
 	// ======================================================================
@@ -210,7 +213,7 @@ void runTest( int numElements )
 	unsigned int uncompMemSize = sizeof( float) * numUncompElems; // size of the memory
 	
 	// printf("last scan elem: %f\n", h_exclusiveScan[0]);
-	printf("total uncompressed elements: %d\n", numUncompElems);
+	fprintf(file, "total uncompressed elements: %d\n", numUncompElems);
 		
     // allocate device memory for exclusive scan output
     float* h_uncompressedArr = (float*) malloc( uncompMemSize);
@@ -228,7 +231,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[3], start, stop );
-	printf("Time to complete Stage 2: %f\n", elapsedTime[3]);
+	fprintf(file, "Time to complete Stage 2: %f\n", elapsedTime[3]);
 		
 	
 	// ======================================================================
@@ -243,7 +246,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[4], start, stop );
-	printf("Time to complete Stage 3: %f\n", elapsedTime[4]);
+	fprintf(file, "Time to complete Stage 3: %f\n", elapsedTime[4]);
 
 	CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
 	
@@ -275,7 +278,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[5], start, stop );
-	printf("Time to complete Stage 4: %f\n", elapsedTime[5]);
+	fprintf(file, "Time to complete Stage 4: %f\n", elapsedTime[5]);
 	
     result = cudppDestroyPlan(scanplan);
     if (CUDPP_SUCCESS != result)
@@ -302,7 +305,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[6], start, stop );
-	printf("Time to complete Stage 5: %f\n", elapsedTime[6]);
+	fprintf(file, "Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
 	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
@@ -330,6 +333,8 @@ void runTest( int numElements )
 	/* Destroy the timer */
 	cudaEventDestroy( start ); 
 	cudaEventDestroy( stop );
+	fclose(file); /*done!*/
+    
 }
 
 //  Kernel 1:  get X as Exclusive-scan of F
