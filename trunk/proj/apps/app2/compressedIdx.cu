@@ -1,6 +1,7 @@
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <string.h>
 #include <math.h>
 
@@ -11,7 +12,7 @@
 /**
 * Number of threads per block
 */
-const int blocksize = 32;
+const int blocksize = 512;
 time_t seconds;
 
 __global__
@@ -23,17 +24,22 @@ void uncompress(float *a, char *b, char *s, int N )
 
     if ( i < N )
     {
-		for(size_t j = fromIdx; j < toIdx; ++j)
+		for(unsigned int j = fromIdx; j < toIdx; ++j)
 		{
 			b[j] = s[i];
 		}
     }
 }
 
+double wallClockTime() { //time in seconds
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (1000000*tv.tv_sec+tv.tv_usec)/1.0e6;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
-void runTest( int argc, char** argv);
+void runTest( unsigned int numElements );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -41,20 +47,38 @@ void runTest( int argc, char** argv);
 int
 main( int argc, char** argv)
 {
-    runTest( argc, argv);
-// CUT_EXIT(argc, argv);
-    exit(EXIT_SUCCESS);
+	double wallTime = wallClockTime();
+	
+	if ( argc != 2 )
+    {
+		printf("usage: %s <size n>\n", argv[0]);
+		exit(-1);
+    }
+
+    int numElements = atoi(argv[1]); // number of elements 
+	
+    
+	FILE *file;
+	
+	file = fopen("CPUTimes.txt","a+"); /* apend file (add text to */
+	// start = clock();
+	
+	runTest( numElements );
+    
+	wallTime = wallClockTime() - wallTime;
+	
+	fprintf(file,"%d time: %lf\n",numElements , wallTime); /*writes*/
+    fclose(file); /*done!*/
+    
+    // CUT_EXIT(argc, argv);
+	exit(EXIT_SUCCESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Run a simple test for CUDA
 ////////////////////////////////////////////////////////////////////////////////
-void
-runTest( int argc, char** argv)
+void runTest( unsigned int numElements )
 {
-    CUT_DEVICE_INIT(argc, argv);
-
-    unsigned int numElements = 32; // number of elements
     unsigned int memSize = sizeof( float) * (numElements + 1); // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
@@ -73,7 +97,7 @@ runTest( int argc, char** argv)
 // allocating symbolic data
     for ( unsigned int i = 0; i < numElements; ++i )
     {
-        h_symbols[i] = 'A' + (char) i%26; // (rand() & 0xf);
+        h_symbols[i] = 'A' + (char) (i%26); // (rand() & 0xf);
         printf("i = %c\n", h_symbols[i]);
     }
 
@@ -146,7 +170,7 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbArr, uncompMemSize));
 	
     dim3 dimBlock(blocksize);
-    dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
+    dim3 dimGrid(ceil(numElements/(float)blocksize));
 
 	uncompress<<<dimGrid, dimBlock>>>( d_exclusiveScan, d_uncompSymbArr, d_symbols, numElements);
 
