@@ -100,14 +100,11 @@ int main( int argc, char** argv)
 	exit(EXIT_SUCCESS);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//! Run a simple test for CUDA
-////////////////////////////////////////////////////////////////////////////////
 void runTest( int numElements )
 {
 	/* For timing purposes */
 	cudaEvent_t start, stop;
-	float elapsedTime[4];
+	float elapsedTime[7];
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
     
@@ -135,16 +132,23 @@ void runTest( int numElements )
     // allocate device memory for frequencies
     float* d_frequencies; // frequencies
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_frequencies, memSize));
-    // copy host memory to device
-    CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
-                                cudaMemcpyHostToDevice) );
 
     // allocate device memory for symbols
     char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
+
+	cudaEventRecord( start, 0 );
+    // copy host memory to device
+    CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
+                                cudaMemcpyHostToDevice) );
     // copy host memory to device
     CUDA_SAFE_CALL( cudaMemcpy( d_symbols, h_symbols, symMemSize,
                                 cudaMemcpyHostToDevice) );
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[0], start, stop );
+	printf("Time to copy compressed: %f\n", elapsedTime[0]);
 
     // allocate device memory for exclusive scan output
     float* d_exclusiveScan; // exclusive scan output
@@ -172,14 +176,30 @@ void runTest( int numElements )
         exit(-1);
     }
 
-    // Run the scan
-    cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements);
-
     // allocate mem for the result on host side
     float* h_exclusiveScan = (float*) malloc( sizeof(float));
     // copy result from device to host
+	cudaEventRecord( start, 0 );
+
+	// Run the scan
+    cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements);
+    
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[1], start, stop );
+	printf("Time to complete Stage 1: %f\n", elapsedTime[1]);
+	
+	cudaEventRecord( start, 0 );
+    
     CUDA_SAFE_CALL( cudaMemcpy( &h_exclusiveScan[0], &d_exclusiveScan[numElements-1], sizeof(float),
                                 cudaMemcpyDeviceToHost) );
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[2], start, stop );
+	printf("Time to complete Insignificant Copy: %f\n", elapsedTime[2]);
+	
 							
 	// ======================================================================
 	// = Stage 2: Loop over U threads Each thread i writes a 0 to item i in 
@@ -207,8 +227,8 @@ void runTest( int numElements )
 	cudaEventRecord( stop, 0 );
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
-	cudaEventElapsedTime( &elapsedTime[0], start, stop );
-	printf("Time to complete Stage 2: %f\n", elapsedTime[0]);
+	cudaEventElapsedTime( &elapsedTime[3], start, stop );
+	printf("Time to complete Stage 2: %f\n", elapsedTime[3]);
 		
 	
 	// ======================================================================
@@ -222,8 +242,8 @@ void runTest( int numElements )
 	cudaEventRecord( stop, 0 );
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
-	cudaEventElapsedTime( &elapsedTime[1], start, stop );
-	printf("Time to complete Stage 3: %f\n", elapsedTime[1]);
+	cudaEventElapsedTime( &elapsedTime[4], start, stop );
+	printf("Time to complete Stage 3: %f\n", elapsedTime[4]);
 
 	CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
 	
@@ -254,8 +274,8 @@ void runTest( int numElements )
 	cudaEventRecord( stop, 0 );
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
-	cudaEventElapsedTime( &elapsedTime[2], start, stop );
-	printf("Time to complete Stage 4: %f\n", elapsedTime[2]);
+	cudaEventElapsedTime( &elapsedTime[5], start, stop );
+	printf("Time to complete Stage 4: %f\n", elapsedTime[5]);
 	
     result = cudppDestroyPlan(scanplan);
     if (CUDPP_SUCCESS != result)
@@ -281,8 +301,8 @@ void runTest( int numElements )
 	cudaEventRecord( stop, 0 );
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
-	cudaEventElapsedTime( &elapsedTime[3], start, stop );
-	printf("Time to complete Stage 5: %f\n", elapsedTime[3]);
+	cudaEventElapsedTime( &elapsedTime[6], start, stop );
+	printf("Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
 	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
