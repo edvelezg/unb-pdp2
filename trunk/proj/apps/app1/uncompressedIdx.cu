@@ -80,7 +80,7 @@ int main( int argc, char** argv)
     
 	FILE *file;
 	
-	file = fopen("times.txt","a+"); /* apend file (add text to */
+	file = fopen("CPUtimes.txt","a+"); /* apend file (add text to */
 	start = clock();
 	
 	runTest( numElements );
@@ -94,6 +94,9 @@ int main( int argc, char** argv)
 
 void runTest( int numElements ) 
 {
+	FILE *file;
+	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
+	
 	/* For timing purposes */
 	cudaEvent_t start, stop;
 	float elapsedTime[4];
@@ -103,7 +106,7 @@ void runTest( int numElements )
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
-	printf("number of elems: %d\n", numUncomElems);
+	fprintf(file, "Number of elems: %d\n", numUncomElems);
 
     // allocate host memory
     char* h_symbols = (char*) malloc( memSize); // allocating input data
@@ -143,7 +146,7 @@ void runTest( int numElements )
 	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[0], start, stop );
-	printf("Time to complete copying: %f\n", elapsedTime[0]);
+	fprintf(file, "Time to complete copying: %f\n", elapsedTime[0]);
 	
 	cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
@@ -153,4 +156,5 @@ void runTest( int numElements )
 
     free( h_symbols);
     free( h_uncompSymbols);
+    fclose(file); /*done!*/
 }
