@@ -73,7 +73,7 @@ runTest( int argc, char** argv)
 // allocating symbolic data
     for ( unsigned int i = 0; i < numElements; ++i )
     {
-        h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
+        h_symbols[i] = 'A' + (char) i%26; // (rand() & 0xf);
         printf("i = %c\n", h_symbols[i]);
     }
 
@@ -125,10 +125,10 @@ runTest( int argc, char** argv)
     CUDA_SAFE_CALL( cudaMemcpy( h_odata, d_exclusiveScan, memSize,
                                 cudaMemcpyDeviceToHost) );
 
-	for(size_t i = 0; i < numElements + 1; ++i)
-	{
-		printf("res: %f\n", h_odata[i]);
-	}
+	// for(size_t i = 0; i < numElements + 1; ++i)
+	// {
+	// 	printf("res: %f\n", h_odata[i]);
+	// }
 
     result = cudppDestroyPlan(scanplan);
 
@@ -148,19 +148,26 @@ runTest( int argc, char** argv)
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(numUncompElems/(float)blocksize));
 
-    uncompressed<<<dimGrid, dimBlock>>>( d_exclusiveScan, d_uncompSymbArr, d_symbols, numElements);
+	uncompress<<<dimGrid, dimBlock>>>( d_exclusiveScan, d_uncompSymbArr, d_symbols, numElements);
 
     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompMemSize, cudaMemcpyDeviceToHost));
 
-/**
-* GPU Output.
-*/
+	/**
+	* GPU Output.
+	*/
 
-    printf("Total Elements = %d\n", numUncompElems);
-    printf("c[0]= %f\n", h_uncompSymbArr[0]);
-    printf("c[1]= %f\n", h_uncompSymbArr[1]);
-    printf("c[2]= %f\n", h_uncompSymbArr[2]);
-    // printf("c[%d]= %f\n", numUncompElems-1, h_uncompressedArr[numUncompElems-1]);
+    // printf("Total Elements = %d\n", numUncompElems);
+    // printf("c[0]= %c\n", h_uncompSymbArr[0]);
+    // printf("c[1]= %c\n", h_uncompSymbArr[1]);
+    // printf("c[2]= %c\n", h_uncompSymbArr[2]);
+    // printf("c[3]= %c\n", h_uncompSymbArr[3]);
+    // printf("c[4]= %c\n", h_uncompSymbArr[4]);
+    // printf("c[5]= %c\n", h_uncompSymbArr[5]);
+    // printf("c[6]= %c\n", h_uncompSymbArr[6]);
+    // printf("c[7]= %c\n", h_uncompSymbArr[7]);
+    // printf("c[8]= %c\n", h_uncompSymbArr[8]);
+    // printf("c[9]= %c\n", h_uncompSymbArr[9]);
+    // printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
 
 // shut down the CUDPP library
     cudppDestroy(theCudpp);
