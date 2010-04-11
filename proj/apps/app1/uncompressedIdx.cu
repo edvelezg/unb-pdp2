@@ -91,12 +91,15 @@ int main( int argc, char** argv)
     // CUT_EXIT(argc, argv);
 	exit(EXIT_SUCCESS);
 }
-////////////////////////////////////////////////////////////////////////////////
-//! Run a simple test for CUDA
-////////////////////////////////////////////////////////////////////////////////
-void
-runTest( int numElements ) 
+
+void runTest( int numElements ) 
 {
+	/* For timing purposes */
+	cudaEvent_t start, stop;
+	float elapsedTime[4];
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
@@ -131,21 +134,22 @@ runTest( int numElements )
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, numUncomElems));
     // copy host memory to device
 
-	cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    float elapsedTime[4]; // Init, CPU runtime, memcpy, GPU runtime.
-    cudaEventRecord(start, 0);
+
+	cudaEventRecord( start, 0 );
 
     CUDA_SAFE_CALL( cudaMemcpy( d_uncompSymbols, h_uncompSymbols, memSize,
                                 cudaMemcpyHostToDevice) );
-
-	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[0], start, stop );
+	printf("Time to complete copying: %f\n", elapsedTime[0]);
 	
 	cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&elapsedTime[0], start, stop);
-	printf("GPU elapsed time: %f\n", elapsedTime[0]); 
+
+	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
 
     free( h_symbols);
     free( h_uncompSymbols);
