@@ -107,7 +107,8 @@ void runTest( int numElements )
     unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
 	fprintf(file, "Number of elems: %d\n", numUncomElems);
-
+	fprintf(file, "memSize: %d\n", numUncomElems);
+	
     // allocate host memory
     char* h_symbols = (char*) malloc( memSize); // allocating input data
     char* h_uncompSymbols = (char*) malloc( numUncomElems); // allocating input data
