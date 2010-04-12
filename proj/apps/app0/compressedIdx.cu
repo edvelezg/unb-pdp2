@@ -66,7 +66,7 @@ double wallClockTime() { //time in seconds
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
-void runTest( int numElements );
+void runTest( unsigned int numElements );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -100,7 +100,7 @@ int main( int argc, char** argv)
 	exit(EXIT_SUCCESS);
 }
 
-void runTest( int numElements )
+void runTest( unsigned int numElements )
 {
 	FILE *file;
 	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
@@ -128,7 +128,7 @@ void runTest( int numElements )
 	// allocating symbolic data
     for (unsigned int i = 0; i < numElements; ++i) 
     {
-		h_symbols[i] = 'A' + (char)i; // (rand() & 0xf);
+		h_symbols[i] = 'A' + (char)(i%26); // (rand() & 0xf);
 		// printf("i = %c\n", h_symbols[i]);
     }
 
@@ -308,27 +308,46 @@ void runTest( int numElements )
 	fprintf(file, "Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
-	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
-	//                                 cudaMemcpyDeviceToHost) );
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+                                cudaMemcpyDeviceToHost) );
+
+	/**
+	* GPU Output.
+	*/
+	
 	// 
 	// for(size_t i = 0; i < numUncompElems; ++i)
 	// {
 	// 	printf("r[%d]: %c\n", i, h_uncompSymbArr[i]);
 	// }
 	
+
+    // printf("Total Elements = %d\n", numUncompElems);
+    // printf("c[0]= %c\n", h_uncompSymbArr[0]);
+    // printf("c[1]= %c\n", h_uncompSymbArr[1]);
+    // printf("c[2]= %c\n", h_uncompSymbArr[2]);
+    // printf("c[3]= %c\n", h_uncompSymbArr[3]);
+    // printf("c[4]= %c\n", h_uncompSymbArr[4]);
+    // printf("c[5]= %c\n", h_uncompSymbArr[5]);
+    // printf("c[6]= %c\n", h_uncompSymbArr[6]);
+    // printf("c[7]= %c\n", h_uncompSymbArr[7]);
+    // printf("c[8]= %c\n", h_uncompSymbArr[8]);
+    // printf("c[9]= %c\n", h_uncompSymbArr[9]);
+    // printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
+    
+	
     // shut down the CUDPP library
     cudppDestroy(theCudpp);
     
-    CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
-    CUDA_SAFE_CALL(cudaFree(d_symbols));
-	
-	CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
-
     free( h_frequencies);
     free( h_exclusiveScan);
     free( h_uncompSymbArr);
     free( h_uncompressedArr);
     free( h_symbols);
+
+    CUDA_SAFE_CALL(cudaFree(d_uncompSymbArr));
+    CUDA_SAFE_CALL(cudaFree(d_symbols));
+	CUDA_SAFE_CALL(cudaFree(d_uncompressedArr));
 
 	/* Destroy the timer */
 	cudaEventDestroy( start ); 

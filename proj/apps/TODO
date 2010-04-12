@@ -15,8 +15,12 @@
 // It's load balanced nicely, but takes a lot of kernels to do it,
 // unfortunately.
 
-// OLD ALGO
+// FINISH IMPLEMENT OLD ALGORITHM.
 // TODO: Loop over i threads to N in Array X
 // TODO: each tread writes from x[i] to x[i+1]
 
-// Think of other ways to create synthetic tests.
+// Test OLD ALGORITHM with same standards
+
+// TODO: Think of other ways to create synthetic tests.
+
+

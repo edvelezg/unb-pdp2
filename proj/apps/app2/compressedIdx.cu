@@ -79,6 +79,15 @@ main( int argc, char** argv)
 ////////////////////////////////////////////////////////////////////////////////
 void runTest( unsigned int numElements )
 {
+	FILE *file;
+	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
+	
+	/* For timing purposes */
+	cudaEvent_t start, stop;
+	float elapsedTime[7];
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	
     unsigned int memSize = sizeof( float) * (numElements + 1); // size of the memory
     unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
@@ -98,24 +107,28 @@ void runTest( unsigned int numElements )
     for ( unsigned int i = 0; i < numElements; ++i )
     {
         h_symbols[i] = 'A' + (char) (i%26); // (rand() & 0xf);
-        printf("i = %c\n", h_symbols[i]);
+        // printf("i = %c\n", h_symbols[i]);
     }
 
 	// allocate device memory for frequencies
     float* d_frequencies; // frequencies
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_frequencies, memSize));
-	// copy host memory to device
-    CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
-                                cudaMemcpyHostToDevice) );
-
     // allocate device memory for symbols
     char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
+	
+	cudaEventRecord( start, 0 );
+	// copy host memory to device
+    CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
+                                cudaMemcpyHostToDevice) );
     // copy host memory to device
     CUDA_SAFE_CALL( cudaMemcpy( d_symbols, h_symbols, symMemSize,
                                 cudaMemcpyHostToDevice) );
-
-
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[0], start, stop );
+	fprintf(file, "Time to copy Compressed data: %f\n", elapsedTime[0]);
 
 // allocate device memory for exclusive scan output
     float* d_exclusiveScan; // exclusive scan output
@@ -140,20 +153,23 @@ void runTest( unsigned int numElements )
         exit(-1);
     }
 
+	cudaEventRecord( start, 0 );
+
 // Run the scan
     cudppScan(scanplan, d_exclusiveScan, d_frequencies, numElements+1);
 
-// allocate mem for the result on host side
-    float* h_odata = (float*) malloc( memSize);
-// copy result from device to host
-    CUDA_SAFE_CALL( cudaMemcpy( h_odata, d_exclusiveScan, memSize,
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[1], start, stop );
+	fprintf(file, "Time to perform exclusive scan: %f\n", elapsedTime[1]);
+	
+	// allocate mem for the result on host side
+	float* h_exclusiveScan = (float*) malloc( sizeof(float));
+	// copy result from device to host
+    CUDA_SAFE_CALL( cudaMemcpy( &h_exclusiveScan[0], &d_exclusiveScan[numElements], sizeof(float),
                                 cudaMemcpyDeviceToHost) );
-
-	// for(size_t i = 0; i < numElements + 1; ++i)
-	// {
-	// 	printf("res: %f\n", h_odata[i]);
-	// }
-
+	
     result = cudppDestroyPlan(scanplan);
 
     if ( CUDPP_SUCCESS != result )
@@ -162,7 +178,10 @@ void runTest( unsigned int numElements )
         exit(-1);
     }
 
-	int numUncompElems = h_odata[numElements];
+	int numUncompElems = h_exclusiveScan[0];
+	
+	fprintf(file, "total uncompressed elements: %d\n", numUncompElems);
+	
     unsigned int uncompMemSize = sizeof( char) * numUncompElems; // size of the memory
 
 	char* h_uncompSymbArr = (char*) malloc (uncompMemSize);
@@ -172,7 +191,15 @@ void runTest( unsigned int numElements )
     dim3 dimBlock(blocksize);
     dim3 dimGrid(ceil(numElements/(float)blocksize));
 
+	cudaEventRecord( start, 0 );
+	
 	uncompress<<<dimGrid, dimBlock>>>( d_exclusiveScan, d_uncompSymbArr, d_symbols, numElements);
+	
+	cudaEventRecord( stop, 0 );
+	cudaEventSynchronize( stop );
+	/* block until event actually recorded */
+	cudaEventElapsedTime( &elapsedTime[1], start, stop );
+	fprintf(file, "Time to uncompress: %f\n", elapsedTime[1]);
 
     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompMemSize, cudaMemcpyDeviceToHost));
 
@@ -197,8 +224,13 @@ void runTest( unsigned int numElements )
     cudppDestroy(theCudpp);
 
     free( h_frequencies);
-    free( h_odata);
+    free( h_exclusiveScan);
 // free( reference);
     CUDA_SAFE_CALL(cudaFree(d_frequencies));
     CUDA_SAFE_CALL(cudaFree(d_exclusiveScan));
+
+	/* Destroy the timer */
+	cudaEventDestroy( start ); 
+	cudaEventDestroy( stop );
+	fclose(file); /*done!*/
 }
