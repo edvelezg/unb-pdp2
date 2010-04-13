@@ -20,11 +20,20 @@ the algorithm for uncompressing in parallel within the GPU should be the
 Prefix Sum algorithm.
 
 == Introduction == 
-In this paper two algorithm design approaches are presented for uncompressing an index in the GPU.
+ The projection index supports thread-level parallelism and therefore could potentiall make good use of a GPU. However, most of the time spent when using the index in order to do a query evaluation of a projection index, is spent in transferring data from the CPU to the GPU. Gosink et al. improve on this bottleneck by reducing the size of the data that needs to be transferred, they do so by changing the encoding of the data that needs to be transferred. In this paper to reduce the size of the data that will be transferred from the CPU to the GPU, compression is used. Then after it is transferred, the index is uncompressed using an uncompression algorithm within the GPU itself. 
+
+The compressed projection index is sent to the GPU as two sepparate arrays. One array is the frequencies, which represent the number of times an attribute value repeats, and the other array is the attribute values themselves. For the Run Length encoding compression scheme to be useful in reducing the size of the data, the projection index must be created on columns that are not unique and that allow themselves to be compressed somewhat. After the algorithm is sent to the GPU it is uncompressed using an uncompression algorithm. The algorithms that were designed to perform this job use the Prefix sum algorithm.
+
+== Parallel Prefix sum algorithm == 
+The prefix sum algorithm is an essential building block for the uncompression of a projection index that has been previously compressed in the RLE encoding format. #x et al. present methods to do so in parallel. They first start with the naive algorithm and proceed with more advanced techniques to obtain the best performance. Their first approach involves  
+
+== Design ==
+ In this paper two algorithm design approaches are presented for uncompressing an index in the GPU.
 
 == The Naive unbalanced approach ==
 
 
+== The Load Balanced approach ==
 
 == Future work ==
 
