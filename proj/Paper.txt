@@ -1,0 +1,32 @@
+== Abstract.  ==
+
+One of the difficulties faced when using a general purpose 
+graphing processing on memory intensive tasks, is the considerable amount 
+of time taken to transfer data from a CPU.  Such is the case when one 
+tries to upload a projection index from a CPU onto a GPU.  One way to 
+minimize the amount of data that needs to be transferred is through the 
+use of compression.  In this paper a Run Length Encoding (RLE) compression 
+scheme will be used to minimize the size of the data needed to be 
+transferred.  The idea is to compress a projection index using the RLE 
+scheme and then uncompress it within the GPU with a parallel prefix sum 
+scan which will determine how to allocate and copy the uncompressed 
+projection index within the GPU.  To conclude, a benchmark test will 
+compare whether there's any improvement in performance by loading 
+compressed and uncompressing, as opposed to loading an uncompressed index.
+
+Transfer a compressed projection index column and uncompress it in the 
+GPU.  The compression scheme used would be RLE (Run Length Encoding) and 
+the algorithm for uncompressing in parallel within the GPU should be the 
+Prefix Sum algorithm.
+
+== Introduction == 
+In this paper two algorithm design approaches are presented for uncompressing an index in the GPU.
+
+== The Naive unbalanced approach ==
+
+
+
+== Future work ==
+
+One possible avenue for future work is to compare the GPU's uncompression against the CPU, as it may not be a good algorithm for transferring an index quickly in the GPU, but it may be a good uncompression algorithm.
+  
