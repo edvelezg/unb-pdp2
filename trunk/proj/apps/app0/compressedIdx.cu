@@ -15,6 +15,9 @@
 const int blocksize = 512;
 time_t seconds;
 
+// declare texture reference for 2D float texture
+texture<char, 1, cudaReadModeElementType> tex;
+
 __global__
 void initUncompressedArr(float *c, int N )
 {
@@ -54,7 +57,7 @@ void uncompress(float *a, char *b, char *s, int N )
 
     if ( i < N )
     {
-        b[i] = s[idx];
+        b[i] = tex1Dfetch(tex, idx);
     }
 }
 
@@ -139,6 +142,21 @@ void runTest( unsigned int numElements )
     // allocate device memory for symbols
     char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
+
+    // allocate array and copy image data
+    cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+    cudaArray* cu_array;
+    CUDA_SAFE_CALL( cudaMallocArray( &cu_array, &channelDesc, numElements, 1 )); 
+    CUDA_SAFE_CALL( cudaMemcpyToArray( cu_array, 0, 0, h_symbols, symMemSize, cudaMemcpyHostToDevice));
+
+    // set texture parameters
+    tex.addressMode[0] = cudaAddressModeWrap;
+    tex.filterMode = cudaFilterModeLinear;
+    tex.normalized = true;    // access with normalized texture coordinates
+
+    // Bind the array to the texture
+    CUDA_SAFE_CALL( cudaBindTextureToArray( tex, cu_array, channelDesc));
+
 
 	cudaEventRecord( start, 0 );
     // copy host memory to device
@@ -322,18 +340,18 @@ void runTest( unsigned int numElements )
 	// }
 	
 
-    // printf("Total Elements = %d\n", numUncompElems);
-    // printf("c[0]= %c\n", h_uncompSymbArr[0]);
-    // printf("c[1]= %c\n", h_uncompSymbArr[1]);
-    // printf("c[2]= %c\n", h_uncompSymbArr[2]);
-    // printf("c[3]= %c\n", h_uncompSymbArr[3]);
-    // printf("c[4]= %c\n", h_uncompSymbArr[4]);
-    // printf("c[5]= %c\n", h_uncompSymbArr[5]);
-    // printf("c[6]= %c\n", h_uncompSymbArr[6]);
-    // printf("c[7]= %c\n", h_uncompSymbArr[7]);
-    // printf("c[8]= %c\n", h_uncompSymbArr[8]);
-    // printf("c[9]= %c\n", h_uncompSymbArr[9]);
-    // printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
+    printf("Total Elements = %d\n", numUncompElems);
+    printf("c[0]= %c\n", h_uncompSymbArr[0]);
+    printf("c[1]= %c\n", h_uncompSymbArr[1]);
+    printf("c[2]= %c\n", h_uncompSymbArr[2]);
+    printf("c[3]= %c\n", h_uncompSymbArr[3]);
+    printf("c[4]= %c\n", h_uncompSymbArr[4]);
+    printf("c[5]= %c\n", h_uncompSymbArr[5]);
+    printf("c[6]= %c\n", h_uncompSymbArr[6]);
+    printf("c[7]= %c\n", h_uncompSymbArr[7]);
+    printf("c[8]= %c\n", h_uncompSymbArr[8]);
+    printf("c[9]= %c\n", h_uncompSymbArr[9]);
+    printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
     
 	
     // shut down the CUDPP library
