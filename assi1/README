@@ -1,8 +1,0 @@
-command to use in slickedit
-Project > Properties
-Build ... select dash
-
-nvcc.exe -ccbin "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" -O2 -o %rn %f
-
-also useful programs prac1a.cu " b.cu
-
