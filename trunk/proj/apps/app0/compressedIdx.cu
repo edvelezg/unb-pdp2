@@ -143,21 +143,6 @@ void runTest( unsigned int numElements )
     char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
 
-    // allocate array and copy image data
-    cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-    cudaArray* cu_array;
-    CUDA_SAFE_CALL( cudaMallocArray( &cu_array, &channelDesc, numElements, 1 )); 
-    CUDA_SAFE_CALL( cudaMemcpyToArray( cu_array, 0, 0, h_symbols, symMemSize, cudaMemcpyHostToDevice));
-
-    // set texture parameters
-    tex.addressMode[0] = cudaAddressModeWrap;
-    tex.filterMode = cudaFilterModeLinear;
-    tex.normalized = true;    // access with normalized texture coordinates
-
-    // Bind the array to the texture
-    CUDA_SAFE_CALL( cudaBindTextureToArray( tex, cu_array, channelDesc));
-
-
 	cudaEventRecord( start, 0 );
     // copy host memory to device
     CUDA_SAFE_CALL( cudaMemcpy( d_frequencies, h_frequencies, memSize,
@@ -170,6 +155,9 @@ void runTest( unsigned int numElements )
 	/* block until event actually recorded */
 	cudaEventElapsedTime( &elapsedTime[0], start, stop );
 	fprintf(file, "Time to copy compressed: %f\n", elapsedTime[0]);
+
+    // Bind the array to the texture
+    CUDA_SAFE_CALL( cudaBindTexture( 0, tex, d_symbols, symMemSize));
 
     // allocate device memory for exclusive scan output
     float* d_exclusiveScan; // exclusive scan output
