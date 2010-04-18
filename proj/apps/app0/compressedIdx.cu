@@ -22,7 +22,7 @@ __global__
 void initUncompressedArr(float *c, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-    float Cvalue = 0.0;
+    // float Cvalue = 0.0;
 
     /*
     * Each thread will perform the dot product between the row of the matrix 
@@ -30,7 +30,7 @@ void initUncompressedArr(float *c, int N )
     */
     if ( i < N )
     {
-        c[i] = Cvalue;
+        c[i] = 0.0;
     }
 }
 
