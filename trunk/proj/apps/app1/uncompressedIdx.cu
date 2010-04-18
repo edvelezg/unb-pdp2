@@ -152,18 +152,18 @@ void runTest( int numElements )
     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbols, d_uncompSymbols, memSize,
                                 cudaMemcpyDeviceToHost) );
 
-    // printf("Total Elements = %d\n", numUncomElems);
-    // printf("c[0]= %c\n", h_uncompSymbols[0]);
-    // printf("c[1]= %c\n", h_uncompSymbols[1]);
-    // printf("c[2]= %c\n", h_uncompSymbols[2]);
-    // printf("c[3]= %c\n", h_uncompSymbols[3]);
-    // printf("c[4]= %c\n", h_uncompSymbols[4]);
-    // printf("c[5]= %c\n", h_uncompSymbols[5]);
-    // printf("c[6]= %c\n", h_uncompSymbols[6]);
-    // printf("c[7]= %c\n", h_uncompSymbols[7]);
-    // printf("c[8]= %c\n", h_uncompSymbols[8]);
-    // printf("c[9]= %c\n", h_uncompSymbols[9]);
-    // printf("c[%d]= %c\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
+    printf("Total Elements = %d\n", numUncomElems);
+    printf("c[0]= %c\n", h_uncompSymbols[0]);
+    printf("c[1]= %c\n", h_uncompSymbols[1]);
+    printf("c[2]= %c\n", h_uncompSymbols[2]);
+    printf("c[3]= %c\n", h_uncompSymbols[3]);
+    printf("c[4]= %c\n", h_uncompSymbols[4]);
+    printf("c[5]= %c\n", h_uncompSymbols[5]);
+    printf("c[6]= %c\n", h_uncompSymbols[6]);
+    printf("c[7]= %c\n", h_uncompSymbols[7]);
+    printf("c[8]= %c\n", h_uncompSymbols[8]);
+    printf("c[9]= %c\n", h_uncompSymbols[9]);
+    printf("c[%d]= %c\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
 
 	
 	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
