@@ -41,21 +41,20 @@ int main( int argc, char** argv)
 
 void runTest( int numElements ) 
 {
-	// FILE *file;
-	// file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
+	FILE *file;
+	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
 	
 	/* For timing purposes */
 	cudaEvent_t start, stop;
-	// float elapsedTime[4];
+	float elapsedTime[4];
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
 	
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
-	printf("size: %d\n", numUncomElems);
     unsigned int memSize = sizeof( int) * numUncomElems; // size of the memory
 
-	// fprintf(file, "Number of elems: %d\n", numUncomElems);
-	// fprintf(file, "memSize: %d\n", numUncomElems);
+	fprintf(file, "Number of elems: %d\n", numUncomElems);
+	fprintf(file, "memSize: %d\n", numUncomElems);
 	
     // allocate host memory
     int* h_symbols = (int*) malloc( numElements * sizeof(int)); // allocating input data
@@ -78,12 +77,9 @@ void runTest( int numElements )
 		{
 			h_uncompSymbols[idx] = h_symbols[i];
 			idx++;
-			printf("blah: %d\n", idx);
 		}
 	}
 
-	
-	// fprintf(file, "Time to complete copying: %f\n", elapsedTime[0]);
 	// printf("Total Elements = %d\n", numUncomElems);
 	    printf("h_uncompSymbols[0]= %d\n", h_uncompSymbols[0]);
 	    printf("h_uncompSymbols[1]= %d\n", h_uncompSymbols[1]);
@@ -98,27 +94,27 @@ void runTest( int numElements )
 	    printf("h_uncompSymbols[%d]= %d\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
 	
     // allocate device memory for symbols
-	//     int* d_uncompSymbols; // attribute values
-	//     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, numUncomElems));
-	//     // copy host memory to device
-	// 
-	// 
-	// cudaEventRecord( start, 0 );
-	// 
-	//     CUDA_SAFE_CALL( cudaMemcpy( d_uncompSymbols, h_uncompSymbols, memSize,
-	//                                 cudaMemcpyHostToDevice) );
-	// cudaEventRecord( stop, 0 );
-	// cudaEventSynchronize( stop );
-	// /* block until event actually recorded */
-	// cudaEventElapsedTime( &elapsedTime[0], start, stop );
-	//     
-	// 
+    int* d_uncompSymbols; // attribute values
+    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, memSize));
+	cudaEventRecord( start, 0 );
+	
+    CUDA_SAFE_CALL( cudaMemcpy( d_uncompSymbols, h_uncompSymbols, memSize,
+                                cudaMemcpyHostToDevice) );
+	cudaEventRecord( stop, 0 );
+	
+	/* block until event actually recorded */
+	cudaEventSynchronize( stop );	
+	cudaEventElapsedTime( &elapsedTime[0], start, stop );
+	
+	fprintf(file, "Time to complete copying: %f\n", elapsedTime[0]);
+    
+	// // copy host memory to device
 	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbols, d_uncompSymbols, memSize,
 	//                                 cudaMemcpyDeviceToHost) );
 	
-	// CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
+	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
 
-    // free(h_symbols);
-    // free(h_uncompSymbols);
+    free(h_symbols);
+    free(h_uncompSymbols);
     // fclose(file); /*done!*/
 }
