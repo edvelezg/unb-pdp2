@@ -68,7 +68,7 @@ double wallClockTime() { //time in seconds
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
-void runTest( unsigned int numElements );
+void runTest( unsigned int multiplier );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -83,26 +83,25 @@ int main( int argc, char** argv)
 		exit(-1);
     }
 
-    int numElements = atoi(argv[1]); // number of elements 
-	
+    int multiplier = atoi(argv[1]); // number of elements 	
     
 	FILE *file;
 	
 	file = fopen("CPUTimes.txt","a+"); /* apend file (add text to */
 	// start = clock();
 	
-	runTest( numElements );
+	runTest( multiplier );
     
 	wallTime = wallClockTime() - wallTime;
 	
-	fprintf(file,"%d time: %lf\n", numElements, wallTime); /*writes*/
+	fprintf(file,"%d time: %lf\n", multiplier, wallTime); /*writes*/
     fclose(file); /*done!*/
     
     // CUT_EXIT(argc, argv);
 	exit(EXIT_SUCCESS);
 }
 
-void runTest( unsigned int numElements )
+void runTest( unsigned int multiplier )
 {
 	FILE *file;
 	file = fopen("GPUtimes.txt","a+"); /* apend file (add text to */
@@ -113,7 +112,8 @@ void runTest( unsigned int numElements )
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
     
-    unsigned int memSize = sizeof( float) * numElements; // size of the memory
+	unsigned int numElements = 1024;
+    unsigned int memSize    = sizeof( float) * numElements; // size of the memory
     unsigned int symMemSize = sizeof( int) * numElements; // size of the memory
 
     // allocate host memory
@@ -121,14 +121,14 @@ void runTest( unsigned int numElements )
     int* h_symbols = (int*) malloc( symMemSize); // allocating input data
 
     // initalizing the memory with the elements
-    for (unsigned int i = 0; i < numElements; ++i) 
+    for (int i = 0; i < numElements; ++i) 
     {
-		h_frequencies[i] = (float) (i+1);
-		// printf("i = %f\n", h_frequencies[i]);
+		h_frequencies[i] = (float) (std::pow(2.0, (int)multiplier));
+		printf("i = %f\n", h_frequencies[i]);
     }
 	
 	// allocating symbolic data
-    for (unsigned int i = 0; i < numElements; ++i) 
+    for (int i = 0; i < numElements; ++i) 
     {
 		h_symbols[i] = 'A' + (int)(i%26); // (rand() & 0xf);
 		// printf("i = %c\n", h_symbols[i]);
@@ -314,8 +314,8 @@ void runTest( unsigned int numElements )
 	fprintf(file, "Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
-    // CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
-    //                             cudaMemcpyDeviceToHost) );
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+                                cudaMemcpyDeviceToHost) );
 
 	/**
 	* GPU Output.
