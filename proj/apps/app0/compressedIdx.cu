@@ -314,8 +314,8 @@ void runTest( unsigned int numElements )
 	fprintf(file, "Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
-    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
-                                cudaMemcpyDeviceToHost) );
+    // CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+    //                             cudaMemcpyDeviceToHost) );
 
 	/**
 	* GPU Output.
