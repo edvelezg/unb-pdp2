@@ -124,7 +124,7 @@ void runTest( unsigned int multiplier )
     for (int i = 0; i < numElements; ++i) 
     {
 		h_frequencies[i] = (float) (std::pow(2.0, (int)multiplier));
-		printf("i = %f\n", h_frequencies[i]);
+		// printf("i = %f\n", h_frequencies[i]);
     }
 	
 	// allocating symbolic data
