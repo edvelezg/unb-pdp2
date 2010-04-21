@@ -362,19 +362,27 @@ void runTest( unsigned int numElements )
     
 }
 
-//  Kernel 1:  get X as Exclusive-scan of F
+
+//Phase 1: scan of n+1 elements gives x
 //
-//  Kernel 2: for i = 0 to U
+//Phase 2: for i:= 0 to n
+//                        forall k in parallel do
+//                                for j := x[i] to x[i+1]
+//                                        result [j] = s[j]
+
+//  Phase 1:  get X as Exclusive-scan of F
+//
+//  Phase 2: for i = 0 to U
 //              forall k in parallel do
 //                  write 0 to item i in array A
 //
-//  Kernel 3: for i = 0 to C
+//  Phase 3: for i = 0 to C
 //              forall k in parallel do
 //                  write a 1 to item X[i] in array A 
 //
-//  Kernel 4: get B as Inclusive-scan of array A 
+//  Phase 4: get B as Inclusive-scan of array A 
 //
-//  Kernel 5: for i = 0 to U
+//  Phase 5: for i = 0 to U
 //              forall k in parallel do
 //                  write item S[B[i]] to Uncompressed Index 
 

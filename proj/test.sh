@@ -15,24 +15,24 @@ cd apps
 cd app2
 make
 ./test.sh
-cd ../
-cd ../
-cd apps
-cd app0doubling
-make
-./test.sh
-cd ../
-cd ../
-cd apps
-cd app2doubling
-make
-./test.sh
-cd ../
-cd ../
-cd apps
-cd app1doubling
-make
-./test.sh
+#cd ../
+#cd ../
+#cd apps
+#cd app0doubling
+#make
+#./test.sh
+#cd ../
+#cd ../
+#cd apps
+#cd app2doubling
+#make
+#./test.sh
+#cd ../
+#cd ../
+#cd apps
+#cd app1doubling
+#make
+#./test.sh
 cd ../
 cd ../
 cd apps
