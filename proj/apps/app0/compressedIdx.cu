@@ -370,19 +370,19 @@ void runTest( unsigned int numElements )
 //                                for j := x[i] to x[i+1]
 //                                        result [j] = s[j]
 
-//  Phase 1:  get X as Exclusive-scan of F
+//Phase 1: get X as Exclusive-scan of F
 //
-//  Phase 2: for i = 0 to U
-//              forall k in parallel do
-//                  write 0 to item i in array A
+//Phase 2: for i = 0 to U
+//            forall k in parallel do
+//                write 0 to item i in array A
 //
-//  Phase 3: for i = 0 to C
-//              forall k in parallel do
-//                  write a 1 to item X[i] in array A 
+//Phase 3: for i = 0 to C
+//            forall k in parallel do
+//                write a 1 to item X[i] in array A 
 //
-//  Phase 4: get B as Inclusive-scan of array A 
+//Phase 4: get B as Inclusive-scan of array A 
 //
-//  Phase 5: for i = 0 to U
-//              forall k in parallel do
-//                  write item S[B[i]] to Uncompressed Index 
+//Phase 5: for i = 0 to U
+//            forall k in parallel do
+//                write item S[B[i]] to Uncompressed Index 
 
