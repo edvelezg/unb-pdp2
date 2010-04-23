@@ -80,18 +80,18 @@ void runTest( int numElements )
 		}
 	}
 
-	// printf("Total Elements = %d\n", numUncomElems);
-	    printf("h_uncompSymbols[0]= %d\n", h_uncompSymbols[0]);
-	    printf("h_uncompSymbols[1]= %d\n", h_uncompSymbols[1]);
-	    printf("h_uncompSymbols[2]= %d\n", h_uncompSymbols[2]);
-	    printf("h_uncompSymbols[3]= %d\n", h_uncompSymbols[3]);
-	    printf("h_uncompSymbols[4]= %d\n", h_uncompSymbols[4]);
-	    printf("h_uncompSymbols[5]= %d\n", h_uncompSymbols[5]);
-	    printf("h_uncompSymbols[6]= %d\n", h_uncompSymbols[6]);
-	    printf("h_uncompSymbols[7]= %d\n", h_uncompSymbols[7]);
-	    printf("h_uncompSymbols[8]= %d\n", h_uncompSymbols[8]);
-	    printf("h_uncompSymbols[9]= %d\n", h_uncompSymbols[9]);
-	    printf("h_uncompSymbols[%d]= %d\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
+	printf("Total Elements = %d\n", numUncomElems);
+    printf("h_uncompSymbols[0]= %d\n", h_uncompSymbols[0]);
+    printf("h_uncompSymbols[1]= %d\n", h_uncompSymbols[1]);
+    printf("h_uncompSymbols[2]= %d\n", h_uncompSymbols[2]);
+    printf("h_uncompSymbols[3]= %d\n", h_uncompSymbols[3]);
+    printf("h_uncompSymbols[4]= %d\n", h_uncompSymbols[4]);
+    printf("h_uncompSymbols[5]= %d\n", h_uncompSymbols[5]);
+    printf("h_uncompSymbols[6]= %d\n", h_uncompSymbols[6]);
+    printf("h_uncompSymbols[7]= %d\n", h_uncompSymbols[7]);
+    printf("h_uncompSymbols[8]= %d\n", h_uncompSymbols[8]);
+    printf("h_uncompSymbols[9]= %d\n", h_uncompSymbols[9]);
+    printf("h_uncompSymbols[%d]= %d\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
 	
     // allocate device memory for symbols
     int* d_uncompSymbols; // attribute values
