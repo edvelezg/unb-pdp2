@@ -12,12 +12,12 @@
 
 echo ".:Start:."
 
-COUNT=6
+COUNT=1
 while [ $COUNT -gt 0 ]; do
 	echo $COUNT
-	for (( c=1; c<=10; c++ ))
+	for (( c=1; c<=50; c++ ))
 	do
-		myvar=$(( $c * 500 ))
+		myvar=$(( $c * 100 ))
 		# time release/compressedIdx $myvar
 		release/compressedIdx $myvar
 	done
