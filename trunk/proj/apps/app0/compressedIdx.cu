@@ -16,12 +16,13 @@ const int blocksize = 512;
 time_t seconds;
 
 // declare texture reference for 2D float texture
-texture<int, 1, cudaReadModeElementType> tex;
+texture<char, 1, cudaReadModeElementType> tex;
 
 __global__
 void initUncompressedArr(float *c, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
+    float Cvalue = 0.0;
 
     /*
     * Each thread will perform the dot product between the row of the matrix 
@@ -29,7 +30,7 @@ void initUncompressedArr(float *c, int N )
     */
     if ( i < N )
     {
-        c[i] = 0.0;
+        c[i] = Cvalue;
     }
 }
 
@@ -49,7 +50,7 @@ void writeChangeLocations(float *x, float *c, int N )
 }
 
 __global__
-void uncompress(float *a, int *b, int *s, int N )
+void uncompress(float *a, char *b, char *s, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int idx = (int) a[i];
@@ -95,7 +96,7 @@ int main( int argc, char** argv)
     
 	wallTime = wallClockTime() - wallTime;
 	
-	fprintf(file,"%d time: %lf\n", numElements, wallTime); /*writes*/
+	fprintf(file,"%d time: %lf\n",numElements , wallTime); /*writes*/
     fclose(file); /*done!*/
     
     // CUT_EXIT(argc, argv);
@@ -114,11 +115,11 @@ void runTest( unsigned int numElements )
 	cudaEventCreate(&stop);
     
     unsigned int memSize = sizeof( float) * numElements; // size of the memory
-    unsigned int symMemSize = sizeof( int) * numElements; // size of the memory
+    unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
     // allocate host memory
     float* h_frequencies = (float*) malloc( memSize); // allocating input data
-    int* h_symbols = (int*) malloc( symMemSize); // allocating input data
+    char* h_symbols = (char*) malloc( symMemSize); // allocating input data
 
     // initalizing the memory with the elements
     for (unsigned int i = 0; i < numElements; ++i) 
@@ -130,7 +131,7 @@ void runTest( unsigned int numElements )
 	// allocating symbolic data
     for (unsigned int i = 0; i < numElements; ++i) 
     {
-		h_symbols[i] = 'A' + (int)(i%26); // (rand() & 0xf);
+		h_symbols[i] = 'A' + (char)(i%26); // (rand() & 0xf);
 		// printf("i = %c\n", h_symbols[i]);
     }
 
@@ -139,7 +140,7 @@ void runTest( unsigned int numElements )
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_frequencies, memSize));
 
     // allocate device memory for symbols
-    int* d_symbols; // attribute values
+    char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
 
 	cudaEventRecord( start, 0 );
@@ -295,12 +296,11 @@ void runTest( unsigned int numElements )
 	// ======================================================================
 	// = Stage 5
 	// ======================================================================
-	unsigned int uncompSymMemSize = sizeof( int) * numUncompElems; // size of the memory
-	fprintf(file, "uncompSymMemSize: %d\n", uncompSymMemSize);
+	unsigned int uncompSymMemSize = sizeof( char) * numUncompElems; // size of the memory
 	
     // allocate device memory for exclusive scan output
-    int* h_uncompSymbArr = (int*) malloc( uncompSymMemSize);
-    int* d_uncompSymbArr; // final uncompressed proj idx
+    char* h_uncompSymbArr = (char*) malloc( uncompSymMemSize);
+    char* d_uncompSymbArr; // final uncompressed proj idx
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbArr, uncompSymMemSize));
 
 	cudaEventRecord( start, 0 );
@@ -314,8 +314,8 @@ void runTest( unsigned int numElements )
 	fprintf(file, "Time to complete Stage 5: %f\n", elapsedTime[6]);
 
 
-    // CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
-    //                             cudaMemcpyDeviceToHost) );
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbArr, d_uncompSymbArr, uncompSymMemSize,
+                                cudaMemcpyDeviceToHost) );
 
 	/**
 	* GPU Output.
@@ -329,17 +329,17 @@ void runTest( unsigned int numElements )
 	
 
     printf("Total Elements = %d\n", numUncompElems);
-    printf("c[0]= %d\n", h_uncompSymbArr[0]);
-    printf("c[1]= %d\n", h_uncompSymbArr[1]);
-    printf("c[2]= %d\n", h_uncompSymbArr[2]);
-    printf("c[3]= %d\n", h_uncompSymbArr[3]);
-    printf("c[4]= %d\n", h_uncompSymbArr[4]);
-    printf("c[5]= %d\n", h_uncompSymbArr[5]);
-    printf("c[6]= %d\n", h_uncompSymbArr[6]);
-    printf("c[7]= %d\n", h_uncompSymbArr[7]);
-    printf("c[8]= %d\n", h_uncompSymbArr[8]);
-    printf("c[9]= %d\n", h_uncompSymbArr[9]);
-    printf("c[%d]= %d\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
+    printf("c[0]= %c\n", h_uncompSymbArr[0]);
+    printf("c[1]= %c\n", h_uncompSymbArr[1]);
+    printf("c[2]= %c\n", h_uncompSymbArr[2]);
+    printf("c[3]= %c\n", h_uncompSymbArr[3]);
+    printf("c[4]= %c\n", h_uncompSymbArr[4]);
+    printf("c[5]= %c\n", h_uncompSymbArr[5]);
+    printf("c[6]= %c\n", h_uncompSymbArr[6]);
+    printf("c[7]= %c\n", h_uncompSymbArr[7]);
+    printf("c[8]= %c\n", h_uncompSymbArr[8]);
+    printf("c[9]= %c\n", h_uncompSymbArr[9]);
+    printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
     
 	
     // shut down the CUDPP library
@@ -362,27 +362,19 @@ void runTest( unsigned int numElements )
     
 }
 
-
-//Phase 1: scan of n+1 elements gives x
+//  Kernel 1:  get X as Exclusive-scan of F
 //
-//Phase 2: for i:= 0 to n
-//                        forall k in parallel do
-//                                for j := x[i] to x[i+1]
-//                                        result [j] = s[j]
-
-//Phase 1: get X as Exclusive-scan of F
+//  Kernel 2: for i = 0 to U
+//              forall k in parallel do
+//                  write 0 to item i in array A
 //
-//Phase 2: for i = 0 to U
-//            forall k in parallel do
-//                write 0 to item i in array A
+//  Kernel 3: for i = 0 to C
+//              forall k in parallel do
+//                  write a 1 to item X[i] in array A 
 //
-//Phase 3: for i = 0 to C
-//            forall k in parallel do
-//                write a 1 to item X[i] in array A 
+//  Kernel 4: get B as Inclusive-scan of array A 
 //
-//Phase 4: get B as Inclusive-scan of array A 
-//
-//Phase 5: for i = 0 to U
-//            forall k in parallel do
-//                write item S[B[i]] to Uncompressed Index 
+//  Kernel 5: for i = 0 to U
+//              forall k in parallel do
+//                  write item S[B[i]] to Uncompressed Index 
 
