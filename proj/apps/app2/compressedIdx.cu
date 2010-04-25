@@ -16,7 +16,7 @@ const int blocksize = 512;
 time_t seconds;
 
 __global__
-void uncompress(float *a, int *b, int *s, int N )
+void uncompress(float *a, char *b, char *s, int N )
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int fromIdx = (int) a[i];
@@ -89,11 +89,11 @@ void runTest( unsigned int numElements )
 	cudaEventCreate(&stop);
 	
     unsigned int memSize = sizeof( float) * (numElements + 1); // size of the memory
-    unsigned int symMemSize = sizeof( int) * numElements; // size of the memory
+    unsigned int symMemSize = sizeof( char) * numElements; // size of the memory
 
 // allocate host memory
     float* h_frequencies = (float*) malloc( memSize); // allocating input data
-    int* h_symbols = (int*) malloc( sizeof(int)*numElements); // allocating input data
+    char* h_symbols = (char*) malloc( sizeof(char)*numElements); // allocating input data
 
 // initalizing the memory with the elements
     for ( unsigned int i = 0; i < numElements; ++i )
@@ -106,7 +106,7 @@ void runTest( unsigned int numElements )
 // allocating symbolic data
     for ( unsigned int i = 0; i < numElements; ++i )
     {
-        h_symbols[i] = 'A' + (int) (i%26); // (rand() & 0xf);
+        h_symbols[i] = 'A' + (char) (i%26); // (rand() & 0xf);
         // printf("i = %c\n", h_symbols[i]);
     }
 
@@ -114,7 +114,7 @@ void runTest( unsigned int numElements )
     float* d_frequencies; // frequencies
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_frequencies, memSize));
     // allocate device memory for symbols
-    int* d_symbols; // attribute values
+    char* d_symbols; // attribute values
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_symbols, symMemSize));
 	
 	cudaEventRecord( start, 0 );
@@ -182,10 +182,10 @@ void runTest( unsigned int numElements )
 	
 	fprintf(file, "total uncompressed elements: %d\n", numUncompElems);
 	
-    unsigned int uncompMemSize = sizeof( int) * numUncompElems; // size of the memory
+    unsigned int uncompMemSize = sizeof( char) * numUncompElems; // size of the memory
 
-	int* h_uncompSymbArr = (int*) malloc (uncompMemSize);
-	int* d_uncompSymbArr;
+	char* h_uncompSymbArr = (char*) malloc (uncompMemSize);
+	char* d_uncompSymbArr;
     CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbArr, uncompMemSize));
 	
     dim3 dimBlock(blocksize);
@@ -207,18 +207,18 @@ void runTest( unsigned int numElements )
 	* GPU Output.
 	*/
 
-    printf("Total Elements = %d\n", numUncompElems);
-    printf("c[0]= %d\n", h_uncompSymbArr[0]);
-    printf("c[1]= %d\n", h_uncompSymbArr[1]);
-    printf("c[2]= %d\n", h_uncompSymbArr[2]);
-    printf("c[3]= %d\n", h_uncompSymbArr[3]);
-    printf("c[4]= %d\n", h_uncompSymbArr[4]);
-    printf("c[5]= %d\n", h_uncompSymbArr[5]);
-    printf("c[6]= %d\n", h_uncompSymbArr[6]);
-    printf("c[7]= %d\n", h_uncompSymbArr[7]);
-    printf("c[8]= %d\n", h_uncompSymbArr[8]);
-    printf("c[9]= %d\n", h_uncompSymbArr[9]);
-    printf("c[%d]= %d\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
+    // printf("Total Elements = %d\n", numUncompElems);
+    // printf("c[0]= %c\n", h_uncompSymbArr[0]);
+    // printf("c[1]= %c\n", h_uncompSymbArr[1]);
+    // printf("c[2]= %c\n", h_uncompSymbArr[2]);
+    // printf("c[3]= %c\n", h_uncompSymbArr[3]);
+    // printf("c[4]= %c\n", h_uncompSymbArr[4]);
+    // printf("c[5]= %c\n", h_uncompSymbArr[5]);
+    // printf("c[6]= %c\n", h_uncompSymbArr[6]);
+    // printf("c[7]= %c\n", h_uncompSymbArr[7]);
+    // printf("c[8]= %c\n", h_uncompSymbArr[8]);
+    // printf("c[9]= %c\n", h_uncompSymbArr[9]);
+    // printf("c[%d]= %c\n", numUncompElems-1, h_uncompSymbArr[numUncompElems-1]);
 
 // shut down the CUDPP library
     cudppDestroy(theCudpp);

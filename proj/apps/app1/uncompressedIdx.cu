@@ -14,6 +14,48 @@
 // const int blocksize = 512;
 time_t seconds;
 
+__global__
+void initUncompressedArr(float *c, int N )
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    float Cvalue = 0.0;
+
+    /*
+    * Each thread will perform the dot product between the row of the matrix 
+    * and the vector that is being multiplied. 
+    */
+    if ( i < N )
+    {
+        c[i] = Cvalue;
+    }
+}
+
+//  Each thread i writes a 1 to item X[i] in array A UNLESS X[i] == 0
+//    (A is now [0 0 0 1 0 0 0 0 0 0 1 0 0])
+__global__
+void writeChangeLocations(float *x, float *c, int N )
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    float Cvalue = 1.0;
+	int idx = x[i];
+
+    if ( i < N && idx != 0)
+    {
+        c[idx] = Cvalue;
+    }
+}
+
+__global__
+void uncompress(float *a, char *b, char *s, int N )
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int idx = (int) a[i];
+
+    if ( i < N )
+    {
+        b[i] = s[idx];
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
@@ -24,7 +66,9 @@ void runTest( int numElements );
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char** argv) 
-{	
+{
+	clock_t start;
+	
 	if ( argc != 2 )
     {
 		printf("usage: %s <size n>\n", argv[0]);
@@ -32,8 +76,17 @@ int main( int argc, char** argv)
     }
 
     int numElements = atoi(argv[1]); // number of elements 
-		
+	
+    
+	FILE *file;
+	
+	file = fopen("CPUtimes.txt","a+"); /* apend file (add text to */
+	start = clock();
+	
 	runTest( numElements );
+    
+	fprintf(file,"%d time: %lf\n", numElements , ((double)clock()-start)/CLOCKS_PER_SEC); /*writes*/
+    fclose(file); /*done!*/
     
     // CUT_EXIT(argc, argv);
 	exit(EXIT_SUCCESS);
@@ -51,70 +104,71 @@ void runTest( int numElements )
 	cudaEventCreate(&stop);
 	
     unsigned int numUncomElems = (numElements*(numElements+1))/2; // number of elements 
-    unsigned int memSize = sizeof( int) * numUncomElems; // size of the memory
+    unsigned int memSize = sizeof( char) * numUncomElems; // size of the memory
 
 	fprintf(file, "Number of elems: %d\n", numUncomElems);
 	fprintf(file, "memSize: %d\n", numUncomElems);
 	
     // allocate host memory
-    int* h_symbols = (int*) malloc( numElements * sizeof(int)); // allocating input data
-    int* h_uncompSymbols = (int*) malloc( memSize); // allocating input data
-    int* h_frequencies = (int*) malloc( numElements * sizeof(int)); // allocating input data
-
+    char* h_symbols = (char*) malloc( memSize); // allocating input data
+    char* h_uncompSymbols = (char*) malloc( numUncomElems); // allocating input data
 
 	// allocating symbolic data
     for (unsigned int i = 0; i < numElements; ++i) 
     {
-		h_symbols[i] = 65 + (int)(i%26); // (rand() & 0xf);
-		h_frequencies[i] = (float) (i+1);
-		// printf("%d = %c\n", i, h_symbols[i]);
+		h_symbols[i] = 'A' + (char)(i%26); // (rand() & 0xf);
+		// printf("i = %c\n", h_symbols[i]);
     }
 
-	int idx = 0;
+    // initalizing the memory with the elements
+	unsigned int idx = 0;
     for (unsigned int i = 0; i < numElements; ++i) 
-	{
-		for(unsigned int j = 0; j < h_frequencies[i]; ++j)
+    {
+		for(unsigned int j = 0; j < i+1; ++j)
 		{
+			// printf("sym[%d] = %c\n", j, h_symbols[i]);
 			h_uncompSymbols[idx] = h_symbols[i];
-			idx++;
+			// printf("sym[%d] = %c\n", idx, h_symbols[i]);
+			++idx;
 		}
-	}
-
-	printf("Total Elements = %d\n", numUncomElems);
-    printf("h_uncompSymbols[0]= %d\n", h_uncompSymbols[0]);
-    printf("h_uncompSymbols[1]= %d\n", h_uncompSymbols[1]);
-    printf("h_uncompSymbols[2]= %d\n", h_uncompSymbols[2]);
-    printf("h_uncompSymbols[3]= %d\n", h_uncompSymbols[3]);
-    printf("h_uncompSymbols[4]= %d\n", h_uncompSymbols[4]);
-    printf("h_uncompSymbols[5]= %d\n", h_uncompSymbols[5]);
-    printf("h_uncompSymbols[6]= %d\n", h_uncompSymbols[6]);
-    printf("h_uncompSymbols[7]= %d\n", h_uncompSymbols[7]);
-    printf("h_uncompSymbols[8]= %d\n", h_uncompSymbols[8]);
-    printf("h_uncompSymbols[9]= %d\n", h_uncompSymbols[9]);
-    printf("h_uncompSymbols[%d]= %d\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
+    }
 	
     // allocate device memory for symbols
-    int* d_uncompSymbols; // attribute values
-    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, memSize));
+    char* d_uncompSymbols; // attribute values
+    CUDA_SAFE_CALL( cudaMalloc( (void**) &d_uncompSymbols, numUncomElems));
+    // copy host memory to device
+
+
 	cudaEventRecord( start, 0 );
-	
+
     CUDA_SAFE_CALL( cudaMemcpy( d_uncompSymbols, h_uncompSymbols, memSize,
                                 cudaMemcpyHostToDevice) );
 	cudaEventRecord( stop, 0 );
-	
+	cudaEventSynchronize( stop );
 	/* block until event actually recorded */
-	cudaEventSynchronize( stop );	
 	cudaEventElapsedTime( &elapsedTime[0], start, stop );
-	
 	fprintf(file, "Time to complete copying: %f\n", elapsedTime[0]);
-    
-	// // copy host memory to device
-	//     CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbols, d_uncompSymbols, memSize,
-	//                                 cudaMemcpyDeviceToHost) );
+
+    CUDA_SAFE_CALL( cudaMemcpy( h_uncompSymbols, d_uncompSymbols, memSize,
+                                cudaMemcpyDeviceToHost) );
+
+    printf("Total Elements = %d\n", numUncomElems);
+    printf("c[0]= %c\n", h_uncompSymbols[0]);
+    printf("c[1]= %c\n", h_uncompSymbols[1]);
+    printf("c[2]= %c\n", h_uncompSymbols[2]);
+    printf("c[3]= %c\n", h_uncompSymbols[3]);
+    printf("c[4]= %c\n", h_uncompSymbols[4]);
+    printf("c[5]= %c\n", h_uncompSymbols[5]);
+    printf("c[6]= %c\n", h_uncompSymbols[6]);
+    printf("c[7]= %c\n", h_uncompSymbols[7]);
+    printf("c[8]= %c\n", h_uncompSymbols[8]);
+    printf("c[9]= %c\n", h_uncompSymbols[9]);
+    printf("c[%d]= %c\n", numUncomElems-1, h_uncompSymbols[numUncomElems-1]);
+
 	
 	CUDA_SAFE_CALL( cudaFree(d_uncompSymbols) );
 
     free(h_symbols);
     free(h_uncompSymbols);
-    // fclose(file); /*done!*/
+    fclose(file); /*done!*/
 }
