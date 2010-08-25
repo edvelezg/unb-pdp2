@@ -377,4 +377,3 @@ void runTest( unsigned int numElements )
 //  Kernel 5: for i = 0 to U
 //              forall k in parallel do
 //                  write item S[B[i]] to Uncompressed Index 
-
