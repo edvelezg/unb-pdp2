@@ -35,3 +35,14 @@ Date	 Code	 Description	 Charge	 Credit
 2010/07/30	 FRD05	Res Damage Deposit (Return) 			100.00
 Total:	 3,282.50	 2,543.00
 Ending Balance :	 739.50
+
+
+% First find the volume of the outer sphere
+% CALCULATE outer volume AS 4
+% then find the volume of the inner sphere
+% CALCULATE inner volume AS 4
+% subtract inner volume from outer volume
+% CALCULATE concrete volume AS outer volume - inner volume;
+% adjust the units to cubic yards
+% CALCULATE cubic yards concrete AS concrete volume / 27;
+%
